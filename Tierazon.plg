@@ -1,5 +1,5 @@
 --------------------Configuration: Tierazon - Win32 Release--------------------
-Begining build with project "E:\FRACTALS\Tierazon\Tierazon.dsp", at root.
+Begining build with project "C:\Fractals\Tierazon-25-src\Tierazon.dsp", at root.
 Active configuration is Win32 (x86) Application (based on Win32 (x86) Application)
 
 Project's tools are:
@@ -11,30 +11,28 @@ Project's tools are:
 			"Custom Build" with flags ""
 			"<Component 0xa>" with flags ""
 
-Creating temp file "C:\WINDOWS\TEMP\RSP3034.TMP" with contents </nologo /G5 /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"Release/Tierazon.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
-"E:\FRACTALS\Tierazon\Pattern.cpp"
->
-Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP3034.TMP" 
-Creating temp file "C:\WINDOWS\TEMP\RSP3035.TMP" with contents <vfw32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/Tierazon.pdb" /machine:I386 /out:"Release/Tierazon.exe" 
-.\Release\Cmplx.obj
-.\Release\ColorMethods.obj
-.\Release\Convolut.obj
-.\Release\Dib.obj
-.\Release\Formulae.obj
-.\Release\Fparams.obj
-.\Release\gradient.obj
-.\Release\MainFrm.obj
-.\Release\Orient.obj
-.\Release\Pattern.obj
-.\Release\StdAfx.obj
-.\Release\Tierazon.obj
-.\Release\TierazonDoc.obj
-.\Release\TierazonView.obj
-.\Release\Xysize.obj
-.\Release\Tierazon.res>
-Creating command line "link.exe @C:\WINDOWS\TEMP\RSP3035.TMP" 
-Compiling...
-Pattern.cpp
+Creating command line "rc.exe /l 0x409 /fo"Release/Tierazon.res" /d "NDEBUG" "C:\Fractals\Tierazon-25-src\Tierazon.rc"" 
+Creating temp file "c:\windows\TEMP\RSP23A1.TMP" with contents <vfw32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/Tierazon.pdb" /machine:I386 /out:"Release/Tierazon.exe" 
+".\Release\Cmplx.obj"
+".\Release\ColorMethods.obj"
+".\Release\Convolut.obj"
+".\Release\Dib.obj"
+".\Release\Formulae.obj"
+".\Release\Fparams.obj"
+".\Release\gradient.obj"
+".\Release\MainFrm.obj"
+".\Release\Movie.obj"
+".\Release\Orient.obj"
+".\Release\Pattern.obj"
+".\Release\StdAfx.obj"
+".\Release\Tierazon.obj"
+".\Release\TierazonDoc.obj"
+".\Release\TierazonView.obj"
+".\Release\Unique.obj"
+".\Release\Xysize.obj"
+".\Release\Tierazon.res">
+Creating command line "link.exe @c:\windows\TEMP\RSP23A1.TMP" 
+Compiling resources...
 Linking...
 
 

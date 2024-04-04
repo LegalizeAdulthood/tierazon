@@ -19,7 +19,9 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	CDIB m_dib;
+	CDIB			m_dib;
+	BYTE*			m_pDIB_doc;
+
 	CSize m_sizeDoc;
 	CString doc_PathName;
 

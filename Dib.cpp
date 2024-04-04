@@ -262,7 +262,6 @@ BYTE * CDIB::GetBits()
 
 BOOL CDIB::CreateDIB(DWORD cx, DWORD cy)
 {
-
 	if (m_hDrawDib != NULL)
 	{
 		Close();
@@ -304,18 +303,24 @@ BOOL CDIB::CreateDIB(DWORD cx, DWORD cy)
 		{
 			for (kx = 0 ; kx < cx ; kx++)
 			{
-				red = kx;
-				grn = 128;
-				blu = ky;
+				//red = 128 + kx;
+				//grn = ky;
+				//blu = ky;
+
+				red = grn = blu = 0; // black
+
+				// create a grayscale
+				//ntemp = (int) (((double)red + (double)blu));
+				//red = ntemp;
 
 				if ((red & 0x1FF) > 0xFF) 
-					red = red ^ 0xFF;    // Invert the color
+					red = (red ^ 0x1FF) + 0;    // Invert the color
 
 				if ((grn & 0x1FF) > 0xFF) 
-					grn = grn ^ 0xFF;    // Invert the color
+					grn = (grn ^ 0x1FF) + 0;    // Invert the color
       
 				if ((blu & 0x1FF) > 0xFF) 
-					blu = blu ^ 0xFF;    // Invert the color
+					blu = (blu ^ 0x1FF) + 0;    // Invert the color
 
 				if (!SetPixel(kx, ky, RGB(red, grn, blu)))
 					return FALSE;
@@ -490,7 +495,7 @@ BOOL CDIB::SetPixelTemp (DWORD px, DWORD py, COLORREF Color)
 BOOL CDIB::ApplyDibColors(int nRed, int nGrn, int nBlu,
 	int nRedStart, int nGrnStart, int nBluStart,
 	int *iIter_Data, int* rIter_Data, int* gIter_Data, int* bIter_Data,
-	int nColorOrder, int nColorMethod)
+	int nColorOrder, int nColorMode)
 {
 	ASSERT(IsValid());
 	
@@ -559,6 +564,27 @@ BOOL CDIB::ApplyDibColors(int nRed, int nGrn, int nBlu,
 				grn = (int) (gj*(double)(nGrn))+nGrnStart;
 				blu = (int) (rj*(double)(nBlu))+nBluStart;
 				break;
+			}
+
+			if (nColorMode == I_SEE_DA_LIGHT)
+			{
+				if (red < 0)
+					red = 0;
+
+				if (grn < 0)
+					grn = 0;
+
+				if (blu < 0)
+					blu = 0;
+				
+				if (red > 255)
+					red = 255;
+
+				if (grn > 255)
+					grn = 255;
+
+				if (blu > 255)
+					blu = 255;
 			}
 
 			if ((red & 0x1FF) > 0xFF) 
@@ -1014,4 +1040,10 @@ BOOL CDIB::ReduceDIBSize()
 	}	
 	else
 		return FALSE;		
+}
+
+// Used by AVI file routines
+BYTE* CDIB::Get_m_pDIB()
+{
+	return m_pDIB;
 }

@@ -11,9 +11,19 @@
 #include "external.h"
 #include "xysize.h"
 
-RGB_IDATA CTierazonView::save_stdcall(DLLFUNC func, int nFormula, int nFilter, int nColorMethod, int dBailout, int NMAX, double cx, double cy, double zx, double zy, int px, int py)
+RGB_IDATA CTierazonView::save_stdcall(DLLFUNC func, double cx, double cy, double zx, double zy, int px, int py)
 {
-  return (*func) (nFormula, nFilter, nColorMethod, dBailout, NMAX, cx, cy, zx, zy, px, py);
+  return (*func) (cx, cy, zx, zy, px, py);
+}
+
+int CTierazonView::filter_stdcall(DLLFILTER func, double zx, double zy, int i)
+{
+  return (*func) (zx, zy, i);
+}
+
+RGB_IDATA CTierazonView::complete_stdcall(DLLCOMPLETE func)
+{
+  return (*func) ();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -37,15 +47,55 @@ void CTierazonView::TestEquations()
 	//zy = z.imag();
 		
 	/////////////////////////////////////////////////////*
-	rgbColor = save_stdcall(lpfnFormulae, nDistortion,
-				     nFilter, nColorMethod, dBailout, NMAX,
-				     c.real(), c.imag(), z.real(), z.imag(), px, py);			
+	rgbColor = save_stdcall(lpfnFormulae, 
+						 c.real(), c.imag(), z.real(), z.imag(), px, py);			
 	/////////////////////////////////////////////////////*/
+
+	if (nDistortion == 101 || nDistortion == 118)  // formula editor
+	{		
+		// Formula editor/ parser
+
+		switch (nDistortion)
+		{
+			case 101:  // M-Set
+				while( i++ < NMAX
+					&& z.abs() < dBailout)
+				{
+					z = ParsedExpr->Do();              
+					if (nFilter) 
+						i = filter_stdcall(lpfnFilter, z.real(), z.imag(), i);
+				}
+				break;
+
+			case 118:  // N-Set
+				z2 = cmplx(42,42);
+				while ((z-z2).abs() > dMIN && i++ < NMAX)
+				{
+					z2 = z;
+					z = ParsedExpr->Do();              
+					if (nFilter) 
+						i = filter_stdcall(lpfnFilter, z.real(), z.imag(), i);
+				}
+				break;
+		}
+
+		if (nFilter) 
+		{
+			rgbColor = complete_stdcall(lpfnComplete); 
+		}
+		else
+		{
+			rgbColor.i = i;
+			rgbColor.rj = i;
+			rgbColor.gj = i;
+			rgbColor.bj = i;
+		}		
+	}
 
 	i = (int) rgbColor.i;
 	//i = 1;
 
-	if (dim.cx <= 1024 && dim.cy <= 1024)
+	if (dim.cx <= 640 && dim.cy <= 480 && nUsingBuffers)
 		iIter_Data[px + py*pDoc->m_sizeDoc.cx] = i;
 
 	Returning_From_DLL();
@@ -93,7 +143,7 @@ void CTierazonView::Returning_From_DLL()
 	else
 		Generalized_Coloring_Method();		
 	
-	if (dim.cx <= 1024 && dim.cy <= 1024)
+	if (dim.cx <= 640 && dim.cy <= 480 && nUsingBuffers)
 	{
 		//iIter_Data[px + py*pDoc->m_sizeDoc.cx] = i;
 		rIter_Data[px + py*pDoc->m_sizeDoc.cx] = (int) rj;
@@ -116,6 +166,7 @@ void CTierazonView::Returning_From_DLL()
 			bAbort = TRUE;
 		  bDraw = FALSE;
 		  bLaunch = FALSE;
+			bStartMovie = FALSE;
 	  }              
   }
 }
@@ -129,6 +180,8 @@ void CTierazonView::Terminate()
 	px = dim.cx-1;
 	py = dim.cy-1;
 	bAbort = TRUE;
+	bAutoAntialias_Init = FALSE;
+
 }
 
 /////////////////////////////////////////////////
@@ -158,18 +211,21 @@ void CTierazonView::Generalized_Coloring_Method()
 			red = (int) (gj*(double)(nRed))+nRedStart;
 			grn = (int) (bj*(double)(nGrn))+nGrnStart;
 			blu = (int) (rj*(double)(nBlu))+nBluStart;
+
 			break;
 
 		case 4:		// brg
 			red = (int) (bj*(double)(nRed))+nRedStart;
 			grn = (int) (rj*(double)(nGrn))+nGrnStart;
 			blu = (int) (gj*(double)(nBlu))+nBluStart;
+
 			break;
 
 		case 5:		// bgr
 			red = (int) (bj*(double)(nRed))+nRedStart;
 			grn = (int) (gj*(double)(nGrn))+nGrnStart;
 			blu = (int) (rj*(double)(nBlu))+nBluStart;
+			
 			break;
 	}
 		
@@ -178,7 +234,33 @@ void CTierazonView::Generalized_Coloring_Method()
 
 void CTierazonView::Apply_The_Color()
 {  				
-	
+	if (bGrayScale)
+	{
+		ntemp = (int) (((double)rj + (double)gj + (double)bj)/3.0);
+		red = grn = blu = ntemp;
+	}
+
+	if (nColorMode == I_SEE_DA_LIGHT)
+	{
+		if (red < 0)
+			red = 0;
+
+		if (grn < 0)
+			grn = 0;
+
+		if (blu < 0)
+			blu = 0;
+		
+		if (red > 255)
+			red = 255;
+
+		if (grn > 255)
+			grn = 255;
+
+		if (blu > 255)
+			blu = 255;
+	}
+
 	if ((red & 0x1FF) > 0xFF) 
     red = red ^ 0xFF;    // Invert the color
 
@@ -188,11 +270,9 @@ void CTierazonView::Apply_The_Color()
   if ((blu & 0x1FF) > 0xFF) 
     blu = blu ^ 0xFF;    // Invert the color
 
-	if (bGrayScale)
-	{
-		ntemp = (red + grn + blu)/3;
-		red = grn = blu = ntemp;
-	}
+	red = red & 0xFF;
+	grn = grn & 0xFF;
+	blu = blu & 0xFF;
 
 	if (bColorInvert)
 	{
@@ -200,7 +280,6 @@ void CTierazonView::Apply_The_Color()
 		grn ^= 0xFF;
 		blu ^= 0xFF;
 	}	
-
 }
 
 /////////////////////////////////////////////////////
@@ -365,6 +444,7 @@ void CTierazonView::OnUpdateColorInvert(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter0() 
 {
+	SaveForUndo();
 	nFilter = 0;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -380,6 +460,7 @@ void CTierazonView::OnUpdateFilter0(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter01() 
 {
+	SaveForUndo();
 	nFilter = 1;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -395,6 +476,7 @@ void CTierazonView::OnUpdateFilter01(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter02() 
 {
+	SaveForUndo();
 	nFilter = 2;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -410,6 +492,7 @@ void CTierazonView::OnUpdateFilter02(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter03() 
 {
+	SaveForUndo();
 	nFilter = 3;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -425,6 +508,7 @@ void CTierazonView::OnUpdateFilter03(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter04() 
 {
+	SaveForUndo();
 	nFilter = 4;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -440,6 +524,7 @@ void CTierazonView::OnUpdateFilter04(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter05() 
 {
+	SaveForUndo();
 	nFilter = 5;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -455,6 +540,7 @@ void CTierazonView::OnUpdateFilter05(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter06() 
 {
+	SaveForUndo();
 	nFilter = 6;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -470,6 +556,7 @@ void CTierazonView::OnUpdateFilter06(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter07() 
 {
+	SaveForUndo();
 	nFilter = 7;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -485,6 +572,7 @@ void CTierazonView::OnUpdateFilter07(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter08() 
 {
+	SaveForUndo();
 	nFilter = 8;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -500,6 +588,7 @@ void CTierazonView::OnUpdateFilter08(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter09() 
 {
+	SaveForUndo();
 	nFilter = 9;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -515,6 +604,7 @@ void CTierazonView::OnUpdateFilter09(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter10() 
 {
+	SaveForUndo();
 	nFilter = 10;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -530,6 +620,7 @@ void CTierazonView::OnUpdateFilter10(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter11() 
 {
+	SaveForUndo();
 	nFilter = 11;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -545,6 +636,7 @@ void CTierazonView::OnUpdateFilter11(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter12() 
 {
+	SaveForUndo();
 	nFilter = 12;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -560,6 +652,7 @@ void CTierazonView::OnUpdateFilter12(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter13() 
 {
+	SaveForUndo();
 	nFilter = 13;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -575,6 +668,7 @@ void CTierazonView::OnUpdateFilter13(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter14() 
 {
+	SaveForUndo();
 	nFilter = 14;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -590,6 +684,7 @@ void CTierazonView::OnUpdateFilter14(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter15() 
 {
+	SaveForUndo();
 	nFilter = 15;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -605,6 +700,7 @@ void CTierazonView::OnUpdateFilter15(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter16() 
 {
+	SaveForUndo();
 	nFilter = 16;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -620,6 +716,7 @@ void CTierazonView::OnUpdateFilter16(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter17() 
 {
+	SaveForUndo();
 	nFilter = 17;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -635,6 +732,7 @@ void CTierazonView::OnUpdateFilter17(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter18() 
 {
+	SaveForUndo();
 	nFilter = 18;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -650,6 +748,7 @@ void CTierazonView::OnUpdateFilter18(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter19() 
 {
+	SaveForUndo();
 	nFilter = 19;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -665,6 +764,7 @@ void CTierazonView::OnUpdateFilter19(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter20() 
 {
+	SaveForUndo();
 	nFilter = 20;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -680,6 +780,7 @@ void CTierazonView::OnUpdateFilter20(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter21() 
 {
+	SaveForUndo();
 	nFilter = 21;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -695,6 +796,7 @@ void CTierazonView::OnUpdateFilter21(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter22() 
 {
+	SaveForUndo();
 	nFilter = 22;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -710,6 +812,7 @@ void CTierazonView::OnUpdateFilter22(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter23() 
 {
+	SaveForUndo();
 	nFilter = 23;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -725,6 +828,7 @@ void CTierazonView::OnUpdateFilter23(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter24() 
 {
+	SaveForUndo();
 	nFilter = 24;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -740,6 +844,7 @@ void CTierazonView::OnUpdateFilter24(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter25() 
 {
+	SaveForUndo();
 	nFilter = 25;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -755,6 +860,7 @@ void CTierazonView::OnUpdateFilter25(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter26() 
 {
+	SaveForUndo();
 	nFilter = 26;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -770,9 +876,10 @@ void CTierazonView::OnUpdateFilter26(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter27() 
 {
-	if (nFDOption < 1 || nFDOption > 10)
+	if (nFDOption < 1)
 		nFDOption = 8;
 
+	SaveForUndo();
 	nFilter = 27;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -788,6 +895,7 @@ void CTierazonView::OnUpdateFilter27(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter28() // Standard Deviation
 {
+	SaveForUndo();
 	nFilter = 28;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -804,6 +912,7 @@ void CTierazonView::OnUpdateFilter28(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter29() 
 {
+	SaveForUndo();
 	nFilter = 29;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -819,6 +928,7 @@ void CTierazonView::OnUpdateFilter29(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter30() 
 {
+	SaveForUndo();
 	nFilter = 30;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -834,6 +944,7 @@ void CTierazonView::OnUpdateFilter30(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter31() 
 {
+	SaveForUndo();
 	nFilter = 31;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -849,6 +960,7 @@ void CTierazonView::OnUpdateFilter31(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter32() 
 {
+	SaveForUndo();
 	nFilter = 32;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -864,9 +976,10 @@ void CTierazonView::OnUpdateFilter32(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter33() 
 {
-	if (nFDOption < 1 || nFDOption > 10)
+	if (nFDOption < 1)
 		nFDOption = 4;
 	
+	SaveForUndo();
 	nFilter = 33;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -882,6 +995,7 @@ void CTierazonView::OnUpdateFilter33(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter34() 
 {
+	SaveForUndo();
 	nFilter = 34;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -897,9 +1011,10 @@ void CTierazonView::OnUpdateFilter34(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter35() 
 {
-	if (nFDOption < 1 || nFDOption > 10)
-		nFDOption = 4;
+	if (nFDOption < 1)
+		nFDOption = 8;
 
+	SaveForUndo();
 	nFilter = 35;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -916,6 +1031,7 @@ void CTierazonView::OnUpdateFilter35(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter36() 
 {
+	SaveForUndo();
 	nFilter = 36;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -931,9 +1047,10 @@ void CTierazonView::OnUpdateFilter36(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter37() 
 {
-	if (nFDOption < 1 || nFDOption > 10)
+	if (nFDOption < 1)
 		nFDOption = 4;
 
+	SaveForUndo();
 	nFilter = 37;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -949,9 +1066,10 @@ void CTierazonView::OnUpdateFilter37(CCmdUI* pCmdUI)
 
 void CTierazonView::OnFilter38() 
 {
-	if (nFDOption < 1 || nFDOption > 10)
+	if (nFDOption < 1)
 		nFDOption = 4;
 
+	SaveForUndo();
 	nFilter = 38;	
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -965,10 +1083,241 @@ void CTierazonView::OnUpdateFilter38(CCmdUI* pCmdUI)
 		pCmdUI->SetCheck(FALSE);
 }
 
+void CTierazonView::OnFilter39() 
+{
+	SaveForUndo();
+	nFilter = 39;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter39(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 39)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter40() 
+{
+	SaveForUndo();
+	nFilter = 40;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter40(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 40)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter41() 
+{
+	SaveForUndo();
+	nFilter = 41;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter41(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 41)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter42() 
+{
+	SaveForUndo();
+	nFilter = 42;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter42(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 42)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter43() 
+{
+	SaveForUndo();
+	nFilter = 43;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter43(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 43)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter44() 
+{
+	SaveForUndo();
+	nFilter = 44;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter44(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 44)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter45() 
+{
+	SaveForUndo();
+	nFilter = 45;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter45(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 45)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter46() 
+{
+	SaveForUndo();
+	nFilter = 46;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter46(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 46)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter47() 
+{
+	SaveForUndo();
+	nFilter = 47;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter47(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 47)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter48() 
+{
+	if (nFDOption < 1)
+		nFDOption = 4;
+
+	SaveForUndo();
+	nFilter = 48;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter48(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 48)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter49() 
+{
+	if (nFDOption < 1)
+		nFDOption = 4;
+
+	SaveForUndo();
+	nFilter = 49;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter49(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 49)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter50() 
+{
+	SaveForUndo();
+	nFilter = 50;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter50(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 50)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter51() 
+{
+	SaveForUndo();
+	nFilter = 51;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter51(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 51)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnFilter52() 
+{
+	SaveForUndo();
+	nFilter = 52;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateFilter52(CCmdUI* pCmdUI) 
+{
+	if (nFilter == 52)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
 // Fractal dimension options to go with filter 27.
 
 void CTierazonView::OnOptions1() 
 {
+	SaveForUndo();
 	nFDOption = 1;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -989,6 +1338,7 @@ void CTierazonView::OnUpdateOptions1(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions2() 
 {
+	SaveForUndo();
 	nFDOption = 2;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1009,6 +1359,7 @@ void CTierazonView::OnUpdateOptions2(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions3() 
 {
+	SaveForUndo();
 	nFDOption = 3;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1029,6 +1380,7 @@ void CTierazonView::OnUpdateOptions3(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions4() 
 {
+	SaveForUndo();
 	nFDOption = 4;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1049,6 +1401,7 @@ void CTierazonView::OnUpdateOptions4(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions5() 
 {
+	SaveForUndo();
 	nFDOption = 5;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1069,6 +1422,7 @@ void CTierazonView::OnUpdateOptions5(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions6() 
 {
+	SaveForUndo();
 	nFDOption = 6;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1089,6 +1443,7 @@ void CTierazonView::OnUpdateOptions6(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions7() 
 {
+	SaveForUndo();
 	nFDOption = 7;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1109,6 +1464,7 @@ void CTierazonView::OnUpdateOptions7(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions8() 
 {
+	SaveForUndo();
 	nFDOption = 8;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1129,6 +1485,7 @@ void CTierazonView::OnUpdateOptions8(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions9() 
 {
+	SaveForUndo();
 	nFDOption = 9;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1149,6 +1506,7 @@ void CTierazonView::OnUpdateOptions9(CCmdUI* pCmdUI)
 
 void CTierazonView::OnOptions10() 
 {
+	SaveForUndo();
 	nFDOption = 10;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -1157,6 +1515,217 @@ void CTierazonView::OnOptions10()
 void CTierazonView::OnUpdateOptions10(CCmdUI* pCmdUI) 
 {
 	if (nFDOption == 10)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+
+void CTierazonView::OnOptions11() 
+{
+	SaveForUndo();
+	nFDOption = 11;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions11(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 11)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions12() 
+{
+	SaveForUndo();
+	nFDOption = 12;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions12(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 12)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions13() 
+{
+	SaveForUndo();
+	nFDOption = 13;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions13(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 13)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions14() 
+{
+	SaveForUndo();
+	nFDOption = 14;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions14(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 14)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions15() 
+{
+	SaveForUndo();
+	nFDOption = 15;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions15(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 15)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions16() 
+{
+	SaveForUndo();
+	nFDOption = 16;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions16(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 16)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions17() 
+{
+	SaveForUndo();
+	nFDOption = 17;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions17(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 17)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions18() 
+{
+	SaveForUndo();
+	nFDOption = 18;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions18(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 18)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions19() 
+{
+	SaveForUndo();
+	nFDOption = 19;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions19(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 19)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+
+	if (bMFilter)
+		pCmdUI->Enable(TRUE);
+	else
+		pCmdUI->Enable(FALSE);
+}
+
+void CTierazonView::OnOptions20() 
+{
+	SaveForUndo();
+	nFDOption = 20;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateOptions20(CCmdUI* pCmdUI) 
+{
+	if (nFDOption == 20)
 		pCmdUI->SetCheck(TRUE);
 	else
 		pCmdUI->SetCheck(FALSE);

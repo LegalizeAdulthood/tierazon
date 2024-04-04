@@ -37,7 +37,6 @@ CTierazonDoc::CTierazonDoc()
 
 	doc_PathName = "";
 	m_sizeDoc = CSize(1,1);     // dummy value to make CScrollView happy
-	bNewView = TRUE;
 
 	// Initialize Rubber Banding
 	m_tracker.m_rect.SetRectEmpty();	
@@ -128,8 +127,13 @@ BOOL CTierazonDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		AfxMessageBox("Error Saving File");
 		return FALSE;
 	}
+		
+	//SetTitle(doc_PathName.GetBufferSetLength(doc_PathName.GetLength()-4));
 
 	AfxGetMainWnd()->PostMessage(WM_COMMAND, ID_SAVE_DIB);
+
+	SetModifiedFlag(FALSE);
+
 	return TRUE;	
 }
 

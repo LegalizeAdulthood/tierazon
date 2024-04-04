@@ -518,6 +518,8 @@ void CTierazonView::OnConvolveAntialias()
 	
 	bDraw = TRUE;
 	bLaunch = FALSE;
+
+	bGlobalDraw = TRUE;
 	
 	bReduceSize = TRUE;
 }
@@ -565,6 +567,20 @@ void CTierazonView::OnConvolveReduce()
 	pDoc->m_sizeDoc	= dim;
 
 	bReduceSize = FALSE;
-  OnWindowSizedesktop();
+  //OnWindowSizedesktop();
+}
+
+void CTierazonView::OnConvolveAutoAntialias() 
+{
+	bAutoAntialias ^= 1;
+	if (bAutoAntialias)
+		nUsingBuffers = 0;
+	else
+		nUsingBuffers = 1;
+}
+
+void CTierazonView::OnUpdateConvolveAutoAntialias(CCmdUI* pCmdUI) 
+{
+	pCmdUI->SetCheck(bAutoAntialias);	
 }
 

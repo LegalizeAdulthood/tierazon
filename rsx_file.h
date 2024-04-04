@@ -26,12 +26,13 @@ typedef struct tagRGB_IDATA
 } RGB_IDATA;
 
 #define DUAL_BFACTOR 3
-#define OFFSET_COLOR 64
+#define OFFSET_COLOR 64  //64
 
 // variable declarations
 __complex__ double z, z1, z2, z3, z4, z5, z8, zd, z12, z16, z24, z36, z48;
 __complex__ double c, c1, c2, c3;
 __complex__ double t, t1, t2, t3, X, Y, Z, C, ca, cb, ca2, caa3;
+__complex__ double ci1;
 
 // debug string attributes
 char cstr[100];
@@ -52,12 +53,16 @@ double				*bjData;
 int						size_x, size_y;
 int						px, py;
 
+int						nUsingBuffers;
+
 // formula attributes
 int formula, filter, bailout, maxit, n_color, maxit_save, nFDOption;
 int jul, jul_save;
 
 double d, minsize, maxsize;
 int nRed, nGrn, nBlu, nRedStart, nGrnStart, nBluStart;
+
+double mx, my, zz;
 
 // Color attributes
 RGB_IDATA rgbColor;
@@ -76,6 +81,7 @@ double limit, dStrands_HI, dStrands_LO;
 double dStrands_HI_cx, dStrands_LO_cx;
 double dStrands_HI_cy, dStrands_LO_cy;
 double dStrands_cxd, dStrands_cyd;
+double dStrands_df, limit_cxd, limit_cyd;
 
 double avg, tot, sav, dif, ssq1, ssq2;
 double dif_save;
@@ -98,16 +104,28 @@ double				denominator, x_rmin, x_rmax, y_rmin, y_rmax;
 double				*pXTemp;
 double				*pYTemp;
 
+__complex__   z_std;
+
+__complex__   z_rmin;
+__complex__   z_rmax;
+
 __complex__		cx_std;
 __complex__		cy_std;
+__complex__		cz_std;
+
 __complex__		cFDx;
 __complex__		cFDy;
+__complex__		cFDz;
+
 __complex__		cRng_x;
 __complex__		cRng_y;
+__complex__		cRng_z;
+
 __complex__		cNMAX;
 
 double				dFDx;	// Fractal Dimension x
 double				dFDy; // Fractal Dimension y
+double				dFDz; // Fractal Dimension z
 
 double				dFDx_0;	// Initial F Dimension x
 double				dFDy_0; // Initial F Dimension y
@@ -122,6 +140,7 @@ int						ntemp;
 // Average variables
 double				x_mean;
 double				y_mean;
+__complex__		z_mean;
 
 ///////////////////////////////////
 // implementions
@@ -138,6 +157,7 @@ __complex__ double ccos_z();
 __complex__ double ccos_c();
 __complex__ double csin_z();
 __complex__ double csin_t();
+__complex__ double cexp_z();
 
 double sum_sqrs_z();
 double sum_sqrs_c();
@@ -248,7 +268,23 @@ void Formula_96();
 void Formula_97();
 void Formula_98();
 void Formula_99();
-void Formula_100();
+void Formula_101();
+void Formula_102();
+void Formula_103();
+void Formula_104();
+void Formula_105();
+void Formula_106();
+void Formula_107();
+void Formula_108();
+void Formula_109();
+void Formula_110();
+void Formula_111();
+void Formula_112();
+void Formula_113();
+void Formula_114();
+void Formula_115();
+void Formula_116();
+void Formula_117();
 
 void color_methods();
 void FDimension();

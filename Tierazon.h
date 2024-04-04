@@ -12,6 +12,8 @@
 	#error include 'stdafx.h' before including this file for PCH
 #endif
 
+#define I_SEE_DA_LIGHT 1
+
 #include "resource.h"       // main symbols
 
 /////////////////////////////////////////////////////////////////////////////
@@ -55,6 +57,7 @@ public:
 #define ID_SHIFTCLOSE					(WM_USER + 9)
 #define ID_SHIFTREVERSE				(WM_USER + 10)
 #define ID_SHIFTFORWARD				(WM_USER + 11)
+#define WM_USER_CANCELMOVIE		(WM_USER + 12)
 
 /////////////////////////////////////////////////////////////////////////////
 

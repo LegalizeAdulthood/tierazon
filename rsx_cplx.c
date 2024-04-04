@@ -19,6 +19,14 @@
 // Complex Functions
 ///////////////////////////////////////////////////////////////
 
+__complex__ double cexp_z()
+{
+   __real__ Z = exp( __real__ z ) * cos( __imag__ z );
+   __imag__ Z = exp( __real__ z ) * sin( __imag__ z );
+
+   return Z;
+}
+
 __complex__ double clog_z()
 {
    //cmplx(log(ABS(sum_sqrs(Z),atan2(y,x));}

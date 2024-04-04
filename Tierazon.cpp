@@ -8,6 +8,8 @@
 #include "TierazonDoc.h"
 #include "TierazonView.h"
 #include "external.h"
+#include <dos.h>
+#include <direct.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -69,10 +71,10 @@ BOOL CTierazonApp::InitInstance()
   CStdioFile    outFile;
 
 	bAutoTile = FALSE;
-	bNewView = TRUE;
+	bNewView = FALSE;
 	bZoomingMode = FALSE;
-	global_width	= 320;   // 320
-	global_height = 240;	 // 240
+	global_width	= 160;   // 320
+	global_height = 120;	 // 240
 	
 	bFitToPage = FALSE;
 	bStretchToFit = FALSE;
@@ -146,7 +148,8 @@ BOOL CTierazonApp::InitInstance()
 		return FALSE;
 
 	// The main window has been initialized, so show and update it.
-	pMainFrame->ShowWindow(SW_SHOWMAXIMIZED);
+	//pMainFrame->ShowWindow(SW_SHOWMAXIMIZED);
+	pMainFrame->ShowWindow(SW_SHOW);
 	pMainFrame->UpdateWindow();
 
 	return TRUE;
@@ -173,6 +176,7 @@ public:
 
 // Implementation
 protected:
+	virtual BOOL OnInitDialog();
 	//{{AFX_MSG(CAboutDlg)
 		// No message handlers
 	//}}AFX_MSG
@@ -232,4 +236,49 @@ int CTierazonApp::ExitInstance()
 	END_CATCH
  	
 	return CWinApp::ExitInstance();
+}
+
+BOOL CAboutDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();	// CG:  This was added by System Info Component.
+
+	// CG: Following block was added by System Info Component.
+	{
+		CString strFreeDiskSpace;
+		CString strFreeMemory;
+		CString strFmt;
+
+		// Fill available memory
+		MEMORYSTATUS MemStat;
+		MemStat.dwLength = sizeof(MEMORYSTATUS);
+		GlobalMemoryStatus(&MemStat);
+		strFmt.LoadString(CG_IDS_PHYSICAL_MEM);
+		strFreeMemory.Format(strFmt, MemStat.dwTotalPhys / 1024L);
+
+		//TODO: Add a static control to your About Box to receive the memory
+		//      information.  Initialize the control with code like this:
+		SetDlgItemText(IDC_PHYSICAL_MEM, strFreeMemory);
+
+		// Fill disk free information
+		struct _diskfree_t diskfree;
+		int nDrive = _getdrive(); // use current default drive
+		if (_getdiskfree(nDrive, &diskfree) == 0)
+		{
+			strFmt.LoadString(CG_IDS_DISK_SPACE);
+			strFreeDiskSpace.Format(strFmt,
+				(DWORD)diskfree.avail_clusters *
+				(DWORD)diskfree.sectors_per_cluster *
+				(DWORD)diskfree.bytes_per_sector / (DWORD)1024L,
+				nDrive-1 + _T('A'));
+		}
+		else
+			strFreeDiskSpace.LoadString(CG_IDS_DISK_SPACE_UNAVAIL);
+
+		//TODO: Add a static control to your About Box to receive the memory
+		//      information.  Initialize the control with code like this:
+		SetDlgItemText(IDC_DISK_SPACE, strFreeDiskSpace);
+	}
+
+	return TRUE;	// CG:  This was added by System Info Component.
+
 }

@@ -297,8 +297,11 @@ void Generalized_Coloring_Method20()
 	//c.set_real(x);
 	//c.set_imag(y);
 
-	__real__ c = xsav;
-	__imag__ c = ysav;
+	//__real__ c = xsav;
+	//__imag__ c = ysav;
+
+	__real__ c = x;
+	__imag__ c = y;
 
 	// Circles
 	x_size = 4 / (double) maxit;
@@ -328,8 +331,11 @@ void Generalized_Coloring_Method21()
 	//c.set_real(x);
 	//c.set_imag(y);
 
-	__real__ c = xsav;
-	__imag__ c = ysav;
+	//__real__ c = xsav;
+	//__imag__ c = ysav;
+
+	__real__ c = x;
+	__imag__ c = y;
 
 	// Radial
 	deg = x_y_to_degrees(__real__ c, __imag__ c);
@@ -347,8 +353,11 @@ void Generalized_Coloring_Method22()
 	//c.set_real(x);
 	//c.set_imag(y);
 
-	__real__ c = xsav;
-	__imag__ c = ysav;
+	//__real__ c = xsav;
+	//__imag__ c = ysav;
+
+	__real__ c = x;
+	__imag__ c = y;
 
 	// magnitude
 	x_size = 4 / (double) maxit;
@@ -367,6 +376,7 @@ void Generalized_Coloring_Method22()
 
 void Generalized_Coloring_Method23()
 {
+	/*
 	// Generalized Coloring Method	
 	rj = (50*dFactor_2*(xsav*ysav)*(double)nRed+(double)nRedStart+
 		rj*(double)nRed+(double)nRedStart);
@@ -374,6 +384,12 @@ void Generalized_Coloring_Method23()
 		gj*(double)nGrn+(double)nGrnStart);
 	bj = (50*dFactor_2*(ysav*ysav)*(double)nBlu+(double)nBluStart+
 		bj*(double)nBlu+(double)nBluStart);
+	*/
+
+	// Generalized Coloring Method	
+	rj += 500*dFactor_2*(xsav*ysav);
+	gj += 500*dFactor_2*(xsav*xsav);
+	bj += 500*dFactor_2*(ysav*ysav);
   
 }
 
@@ -391,30 +407,9 @@ void Generalized_Coloring_Method24()
   //wsprintf (cstr, "step 2");
 	//MessageBox(NULL, cstr, "Debug", MB_OK);
 
-	rj = (50*dFactor_2*fabs(sum_sqrs_z()-
-		sum_sqrs_c())*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-
-	//temp = sum_sqrs_z();
-
-  //wsprintf (cstr, "step 2.11");
-	//MessageBox(NULL, cstr, "Debug", MB_OK);
-
-	//temp = temp - sum_sqrs_c();
-
-  //wsprintf (cstr, "step 2.12");
-	//MessageBox(NULL, cstr, "Debug", MB_OK);
-
-	//temp = fabs(temp);
-	
-  //wsprintf (cstr, "step 2.2");
-	//MessageBox(NULL, cstr, "Debug", MB_OK);
-
-	//rj = 50*dFactor_2*temp*(double)nRed+(double)nRedStart+
-	//	rj*(double)nRed+(double)nRedStart;
-
-  //wsprintf (cstr, "step 3");
-	//MessageBox(NULL, cstr, "Debug", MB_OK);
+	//rj += 500*dFactor_2*fabs(sum_sqrs_z()-sum_sqrs_c());
+	//gj += 500*dFactor_2*fabs(xsav*xsav*2-sum_sqrs_c());
+	//bj += 500*dFactor_2*fabs(ysav*ysav*2-sum_sqrs_c());
 
 	gj = (50*dFactor_2*fabs(xsav*xsav*2-
 		sum_sqrs_c())*(double)nGrn+(double)nGrnStart+
@@ -422,9 +417,9 @@ void Generalized_Coloring_Method24()
 	bj = (50*dFactor_2*fabs(ysav*ysav*2-
 		sum_sqrs_c())*(double)nBlu+(double)nBluStart+
 		bj*(double)nBlu+(double)nBluStart);
-
-  //wsprintf (cstr, "step 4");
-	//MessageBox(NULL, cstr, "Debug", MB_OK);
+	rj = (50*dFactor_2*fabs(sum_sqrs_z()-
+		sum_sqrs_c())*(double)nRed+(double)nRedStart+
+		rj*(double)nRed+(double)nRedStart);
 
 
 }
@@ -434,10 +429,9 @@ void Generalized_Coloring_Method25()
 	__real__ c = x;
 	__imag__ c = y;
 
-	rj += (200*dFactor_2*fabs(ysav*__imag__ c)*(double)nRed+(double)nRedStart);
-	gj += (200*dFactor_2*fabs(xsav*__real__ c)*(double)nGrn+(double)nGrnStart);
-	bj += (200*dFactor_2*fabs(xsav*ysav)*(double)nBlu+(double)nBluStart);
-
+	rj += 2000*dFactor_2*fabs(ysav*__imag__ c);
+	gj += 2000*dFactor_2*fabs(xsav*__real__ c);
+	bj += 2000*dFactor_2*fabs(xsav*ysav);
 }
 
 void Generalized_Coloring_Method26()
@@ -445,28 +439,17 @@ void Generalized_Coloring_Method26()
 	__real__ c = x;
 	__imag__ c = y;
 
-	rj = 200*dFactor_2*xsav*ysav-
-		sum_sqrs_c()*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart;
-
-	gj = 200*dFactor_2*xsav*xsav-
-		sum_sqrs_c()*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart;
-
-	bj = 200*dFactor_2*ysav*ysav-
-		sum_sqrs_c()*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart;
+	rj += 200*dFactor_2*(xsav*ysav-sum_sqrs_c());
+	gj += 200*dFactor_2*(xsav*xsav-sum_sqrs_c());
+	bj += 200*dFactor_2*(ysav*ysav-sum_sqrs_c());
 }
 
 void Generalized_Coloring_Method27()
 {
 	// Generalized Coloring Method	
-	rj = (200*dFactor_2*xsav*ysav*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-	gj = (200*dFactor_2*xsav*xsav*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart);
-	bj = (200*dFactor_2*ysav*ysav*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart);
+	rj += 2000*dFactor_2*xsav*ysav;
+	gj += 2000*dFactor_2*xsav*xsav;
+	bj += 2000*dFactor_2*ysav*ysav;
 }
 
 void Generalized_Coloring_Method28()
@@ -477,94 +460,73 @@ void Generalized_Coloring_Method28()
 	__real__ c = x;
 	__imag__ c = y;
 
-	rj = (int) (200*dFactor_2*fabs(sum_sqrs_z()-
-		sum_sqrs_c())*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-	gj = (int) (200*dFactor_2*fabs(xsav*xsav*2-
-		sum_sqrs_c())*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart);
-	bj = (int) (200*dFactor_2*fabs(ysav*ysav*2-
-		sum_sqrs_c())*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart);
+	rj += 200*dFactor_2*fabs(sum_sqrs_z()-sum_sqrs_c());
+	gj += 200*dFactor_2*fabs(xsav*xsav*2-sum_sqrs_c());
+	bj += 200*dFactor_2*fabs(ysav*ysav*2-sum_sqrs_c());
 }
 
 void Generalized_Coloring_Method29()
 {
-	rj = (rj*(double)nRed*dFactor_2+(double)nRedStart);
-	gj = (gj*(double)nGrn*dFactor_2+(double)nGrnStart);
-	bj = (bj*(double)nBlu*dFactor_2+(double)nBluStart);	
+	rj += rj*(double)nRed*dFactor_2*10;
+	gj += gj*(double)nGrn*dFactor_2*10;
+	bj += bj*(double)nBlu*dFactor_2*10;
 
 }
 
 void Generalized_Coloring_Method30()
 {
-	gj = (rj*(double)nRed*dFactor_2+(double)nRedStart);
-	rj = (gj*(double)nGrn*dFactor_2+(double)nGrnStart);
-	bj = (bj*(double)nBlu*dFactor_2+(double)nBluStart);	
-
+	gj += sin(rj)*10*dFactor_2;
+	rj += sin(gj)*10*dFactor_2;
+	bj += sin(bj)*10*dFactor_2;
 }
 
 void Generalized_Coloring_Method31()
 {
 	// Generalized Coloring Method	
-	bj = (200*dFactor*fabs(xsav*ysav)*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-	gj = (200*dFactor*fabs(xsav*xsav)*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart);
-	rj = (200*dFactor*fabs(ysav*ysav)*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart);
-
+	bj += 2000*dFactor_2*fabs(xsav*ysav);
+	gj += 2000*dFactor_2*fabs(xsav*xsav);
+	rj += 2000*dFactor_2*fabs(ysav*ysav);
 }
 
 void Generalized_Coloring_Method32()
 {
 	// Generalized Coloring Method	
-	bj = (200*dFactor_2*fabs(xsav*ysav)*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-	rj = (200*dFactor_2*fabs(xsav*xsav)*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart);
-	gj = (200*dFactor_2*fabs(ysav*ysav)*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart);
-
+	bj += 2000*dFactor_2*fabs(xsav*ysav);
+	rj += 2000*dFactor_2*fabs(xsav*xsav);
+	gj += 2000*dFactor_2*fabs(ysav*ysav);
 }
 
 void Generalized_Coloring_Method33()
 {
 	// Generalized Coloring Method	
-	rj = (200*dFactor_2*fabs(xsav*ysav)*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-	gj = (200*dFactor_2*fabs(xsav*xsav)*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart);
-	bj = (200*dFactor_2*fabs(ysav*ysav)*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart);
-
+	rj += 1000*dFactor_2*fabs(xsav*ysav);
+	gj += 1000*dFactor_2*fabs(xsav*xsav);
+	bj += 1000*dFactor_2*fabs(ysav*ysav);
 }
 
 void Generalized_Coloring_Method34()
 {
-	rj += (dFactor_2*5*(double)nRed*fabs(xsav+ysav)+(double)nRedStart);
-	gj += (dFactor_2*5*(double)nGrn*fabs(xsav+xsav)+(double)nGrnStart);
-	bj += (dFactor_2*5*(double)nBlu*fabs(ysav+ysav)+(double)nBluStart);
+	rj += sin(rj)*dFactor_2*10;
+	gj += cos(gj)*dFactor_2*10;
+	bj += cos(bj)*dFactor_2*10;
 				
 }
 
 void Generalized_Coloring_Method35()
 {
-	rj += (dFactor_2*5*(double)nRed*fabs(xsav*ysav)+(double)nRedStart);
-	gj += (dFactor_2*5*(double)nGrn*fabs(xsav*xsav)+(double)nGrnStart);
-	bj += (dFactor_2*5*(double)nBlu*fabs(ysav*ysav)+(double)nBluStart);
-
+	rj += sin(rj*rj)*dFactor_2*10;
+	gj += sin(gj*gj)*dFactor_2*10;
+	bj += sin(bj*bj)*dFactor_2*10;
 }
 
 void Generalized_Coloring_Method36()
 {
-	rj = (200*dFactor_2*(cos(fabs(xsav*xsav)))*(double)nRed+(double)nRedStart+
-			rj*(double)nRed+(double)nRedStart);
-	gj = (200*dFactor_2*(cos(fabs(xsav*ysav)))*(double)nGrn+(double)nGrnStart+
-			gj*(double)nGrn+(double)nGrnStart);
-	bj = (200*dFactor_2*(cos(sum_sqrs_z()))*(double)nBlu+(double)nBluStart+
-			bj*(double)nBlu+(double)nBluStart);
-						
+	__real__ z = xsav;
+	__imag__ z = ysav;
+	
+	rj += 2000*dFactor_2*(cos(fabs(xsav*xsav)));
+	gj += 2000*dFactor_2*(cos(fabs(xsav*ysav)));
+	bj += 2000*dFactor_2*(cos(sum_sqrs_z()));						
 }
 
 void Generalized_Coloring_Method37()
@@ -572,32 +534,23 @@ void Generalized_Coloring_Method37()
 	__real__ z = xsav;
 	__imag__ z = ysav;
 
-	rj = (200*dFactor_2*(cos(sum_sqrs_z()))*(double)nRed+(double)nRedStart+
-			rj*(double)nRed+(double)nRedStart);
-	gj = (200*dFactor_2*(sin(fabs(xsav*ysav)))*(double)nGrn+(double)nGrnStart+
-			gj*(double)nGrn+(double)nGrnStart);
-	bj = (200*dFactor_2*(cos(fabs(ysav*xsav)))*(double)nBlu+(double)nBluStart+
-			bj*(double)nBlu+(double)nBluStart);
+	rj += 2000*dFactor_2*(cos(sum_sqrs_z()));
+	gj += 2000*dFactor_2*(sin(fabs(xsav*ysav)));
+	bj += 2000*dFactor_2*(cos(fabs(ysav*xsav)));
 }
 
 void Generalized_Coloring_Method38()
 {
-	rj = (100*dFactor_2*(fabs(atan(xsav/ysav)))*(double)nRed+(double)nRedStart+
-			rj*(double)nRed+(double)nRedStart);
-	gj = (100*dFactor_2*(fabs(atan(xsav/ysav)))*(double)nGrn+(double)nGrnStart+
-			gj*(double)nGrn+(double)nGrnStart);
-	bj = (100*dFactor_2*(fabs(atan(ysav/xsav)))*(double)nBlu+(double)nBluStart+
-			bj*(double)nBlu+(double)nBluStart);					
+	rj += 500*dFactor_2*(fabs(atan(xsav/ysav)));
+	gj += 500*dFactor_2*(fabs(atan(xsav/ysav)));
+	bj += 500*dFactor_2*(fabs(atan(ysav/xsav)));					
 }
 
 void Generalized_Coloring_Method39()
 {
-	rj = (50*dFactor_2*(fabs(xsav*xsav))*(double)nRed+(double)nRedStart+
-		rj*(double)nRed+(double)nRedStart);
-	gj = (50*dFactor_2*(fabs(xsav*xsav))*(double)nGrn+(double)nGrnStart+
-		gj*(double)nGrn+(double)nGrnStart);
-	bj = (50*dFactor_2*(fabs(ysav*ysav))*(double)nBlu+(double)nBluStart+
-		bj*(double)nBlu+(double)nBluStart);
+	rj += 500*dFactor_2*(fabs(xsav*xsav));
+	gj += 500*dFactor_2*(fabs(xsav*xsav));
+	bj += 500*dFactor_2*(fabs(ysav*ysav));
 					
 }
 

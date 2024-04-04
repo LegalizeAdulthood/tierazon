@@ -17,14 +17,17 @@ typedef struct tagRGB_IDATA
 	double bj;
 } RGB_IDATA;
 
-typedef RGB_IDATA (WINAPI *DLLFUNC) (int, int, int, int, int, double, double, double, double, int, int);
+typedef RGB_IDATA (WINAPI *DLLFUNC) (double, double, double, double, int, int);
 typedef RGB_IDATA (WINAPI *DLLCOLOR) (int, int, int, double, double, double, double);
-typedef int (WINAPI *DLLINIT) (int, int, double, double, double, double, double, double*, double*, double*, double*, double*, double*, double*, int, int, int, int, int, int, int, int, int, int);
+typedef void (WINAPI *DLLINIT) (int, int, int, int, int, int, int, double, double, double, double, double, double*, double*, double*, double*, double*, double*, double*, int, int, int, int, int, int, int, int, int, int, int);
+typedef int (WINAPI *DLLFILTER) (double, double, int);
+typedef RGB_IDATA (WINAPI *DLLCOMPLETE) ();
 
 #include "cmplx.h"
 
 class   		CGradient;
 class				CConvolut;
+class				CMovie;
 
 class CTierazonView : public CScrollView
 {
@@ -39,19 +42,78 @@ public:
 // Operations
 public:
 	// DLL parameters /////////////////////////
-  HINSTANCE hLib;
+  HINSTANCE			hLib;
 
-  DLLFUNC lpfnFormulae;
-	DLLCOLOR lpfnColorUpdate;
-	DLLINIT lpfnInitialize;
+  DLLFUNC				lpfnFormulae;
+	DLLCOLOR			lpfnColorUpdate;
+	DLLINIT				lpfnInitialize;
+	DLLFILTER			lpfnFilter;
+	DLLCOMPLETE		lpfnComplete;
 
-	RGB_IDATA rgbColor;
+	RGB_IDATA			rgbColor;
 	
 	BOOL					bMFilter;
 	BOOL					bColorInvert;
 	BOOL					bGrayScale;
+	BOOL					bFirstView;
+	BOOL					bAutoAntialias;
+	BOOL					bAutoAntialias_Init;
+	int 					nUsingBuffers;
 
   char buf[260];
+
+	// AVI File Attributes
+	CString				AVIFileName;
+	BOOL					bLockStart;
+	BOOL					bLockFinish;
+	BOOL					bStartMovie;
+	BOOL 					bZoomStart;
+	BOOL					bPositive;
+	BOOL					bPositiveX;
+	BOOL					bPositiveY;
+
+	double				CRMID_MovieStart;
+	double 				CRMID_MovieFinish;
+	double				CIMID_MovieStart;
+	double				CIMID_MovieFinish;
+	double				CRMID_FrameRatio;
+	double				CIMID_FrameRatio;
+	double				dMovieMagnifStart;
+	double				dMovieMagnifFinish;
+	double				dMovieFrameRatio;
+	double				dMagnification_Start;
+	double				dMagnification_Finish;
+
+	PAVIFILE							pfile;
+	PAVIFILE							pf_new;
+	PAVISTREAM						pstream;
+	PAVISTREAM						ps_new;
+	PGETFRAME							pget;
+	LPBITMAPINFOHEADER		lpbi;
+	LPBITMAPINFOHEADER		biNew;
+	HRESULT								hr;
+	DWORD									dwMovieRate;
+
+	AVISTREAMINFO					strhdr;
+	AVISTREAMINFO					newstr;	
+
+	BITMAPINFOHEADER			bi;
+	long									lStreamSize;
+	
+	BOOL									bAVIFileOpen;
+	BOOL									bAVIPlaying;
+	BOOL									bMovieView;
+	BOOL									bJuliaVideoMode;
+	BOOL									bOrientationVideoMode;
+
+	LONG									frame, frames;
+	CString								szFrameNumber;
+	CString								szTotalFrames;
+	UINT									tmillisecs;
+	UINT									timer;
+	WORD									bitcount;				
+
+	CMovie*								m_pMovieView;
 
 	///////////////////////////////////////////	
 	// Fractal dimension variables
@@ -89,9 +151,12 @@ public:
 	int						nFDOption;
 	int						NMAX_Save;
 	int						nColorMethod;
+	int						nColorMode;
 	int						nColorMethodSave;
 	int						min, max;
 	int						ntemp;
+
+	int						nFormulaType;
 
 	int						nFilterSave;
 	int						nDistortionSave;
@@ -189,6 +254,7 @@ public:
 	int						kr, kc;
 	int						UBANDS;
 	int						nMatrix;
+	int						n_color_sav;
 
 	BYTE					color;
 
@@ -275,6 +341,11 @@ public:
 	double				cxx, cyy;
   int  					nDistortion;
 
+	int						nDistortion_sav;
+	int						nFilter_sav;
+	int						nColorMethod_sav;
+	int						nFDOption_sav;
+
  	int niter,            /* maximum number of iterations */
     px, py,             /* current pixel */
     nx, ny,             /* number of pixels */
@@ -322,8 +393,8 @@ public:
   double        u_imag, v_imag, w_imag, z_imag;
   CString       strFormulae;
 
-  //#include "Expression.h"
-  //MExpression*  ParsedExpr;
+  #include "Expression.h"
+  MExpression*  ParsedExpr;
 
 // Operations
 public:
@@ -355,10 +426,18 @@ public:
 	void Returning_From_DLL();
 	//void FDimension();
 
+	void UpdateMovieData();
+	void CloseAVIFile();
+	void GenerateAMovie();
+	void SaveForUndo();
+	void Load_DLL();
+
 	// DLL function calls
-	RGB_IDATA save_stdcall(DLLFUNC func, int nFormula, int nFilter, int nColorMethod, int dBailout, int NMAX, double cx, double cy, double zx, double zy, int px, int py);
+	RGB_IDATA save_stdcall(DLLFUNC func, double cx, double cy, double zx, double zy, int px, int py);
 	RGB_IDATA color_stdcall(DLLCOLOR func, int px, int py, int nColorMethod, double cx, double cy, double zx, double zy);
-	void init_stdcall(DLLINIT func, int _jul, int _jul_save, double _dStrands, double _dBay100, double _dBay1000, double _dLower, double _dUpper, double *pXTemp, double *pYTemp, double *pXSave, double *pYSave, double *rjData, double *gjData, double *bjData, int nRed, int nGrn, int nBlu, int nRedStart, int nGrnStart, int nBluStart, int nFDOption, int bDimensionVariant, int size_x, int size_y);
+	void init_stdcall(DLLINIT func, int nFormula, int nFilter, int nColorMethod, int dBailout, int NMAX, int _jul, int _jul_save, double _dStrands, double _dBay100, double _dBay1000, double _dLower, double _dUpper, double *pXTemp, double *pYTemp, double *pXSave, double *pYSave, double *rjData, double *gjData, double *bjData, int nRed, int nGrn, int nBlu, int nRedStart, int nGrnStart, int nBluStart, int nFDOption, int bDimensionVariant, int size_x, int size_y, int nUsingBuffers);
+	int filter_stdcall(DLLFILTER func, double zx, double zy, int i);
+	RGB_IDATA complete_stdcall(DLLCOMPLETE func);
 
 	///////////////////////////////////////////////////////////////////
 	// Modeless Dialog message routines
@@ -369,8 +448,8 @@ public:
   // Formulae Parser Functions
   //cmplx ParseExpression( const char* str, int& index );
   //cmplx ParseOperand( const char* str, int& index );
-  //MExpression* ParseExpression( const char* str, int& index );
-  //MExpression* ParseOperand( const char* str, int& index );
+  MExpression* ParseExpression( const char* str, int& index );
+  MExpression* ParseOperand( const char* str, int& index );
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -401,6 +480,7 @@ protected:
 protected:
 	afx_msg void OnContextMenu(CWnd*, CPoint point);
 	//{{AFX_MSG(CTierazonView)
+	afx_msg LONG CancelMovie(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnSaveDib();
 	afx_msg void OnWindowSizedesktop();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
@@ -849,6 +929,109 @@ protected:
 	afx_msg void OnUpdateDraw99(CCmdUI* pCmdUI);
 	afx_msg void OnDraw100();
 	afx_msg void OnUpdateDraw100(CCmdUI* pCmdUI);
+	afx_msg void OnDraw101();
+	afx_msg void OnUpdateDraw101(CCmdUI* pCmdUI);
+	afx_msg void OnDrawUnique();
+	afx_msg void OnFilter39();
+	afx_msg void OnUpdateFilter39(CCmdUI* pCmdUI);
+	afx_msg void OnFilter40();
+	afx_msg void OnUpdateFilter40(CCmdUI* pCmdUI);
+	afx_msg void OnFilter41();
+	afx_msg void OnUpdateFilter41(CCmdUI* pCmdUI);
+	afx_msg void OnFilter42();
+	afx_msg void OnUpdateFilter42(CCmdUI* pCmdUI);
+	afx_msg void OnFilter43();
+	afx_msg void OnUpdateFilter43(CCmdUI* pCmdUI);
+	afx_msg void OnFractalsMovie();
+	afx_msg void OnFractalStartgeneratingamovie();
+	afx_msg void OnUpdateFractalStartgeneratingamovie(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFractalsMovie(CCmdUI* pCmdUI);
+	afx_msg void OnFractalVideoplayer();
+	afx_msg void OnConvolveAutoAntialias();
+	afx_msg void OnUpdateConvolveAutoAntialias(CCmdUI* pCmdUI);
+	afx_msg void OnViewJuliavideo();
+	afx_msg void OnUpdateViewJuliavideo(CCmdUI* pCmdUI);
+	afx_msg void OnViewOrientationvideo();
+	afx_msg void OnUpdateViewOrientationvideo(CCmdUI* pCmdUI);
+	afx_msg void OnDraw102();
+	afx_msg void OnUpdateDraw102(CCmdUI* pCmdUI);
+	afx_msg void OnDraw103();
+	afx_msg void OnUpdateDraw103(CCmdUI* pCmdUI);
+	afx_msg void OnDraw104();
+	afx_msg void OnUpdateDraw104(CCmdUI* pCmdUI);
+	afx_msg void OnFilter44();
+	afx_msg void OnUpdateFilter44(CCmdUI* pCmdUI);
+	afx_msg void OnFilter45();
+	afx_msg void OnUpdateFilter45(CCmdUI* pCmdUI);
+	afx_msg void OnFilter46();
+	afx_msg void OnUpdateFilter46(CCmdUI* pCmdUI);
+	afx_msg void OnFilter47();
+	afx_msg void OnUpdateFilter47(CCmdUI* pCmdUI);
+	afx_msg void OnDraw105();
+	afx_msg void OnUpdateDraw105(CCmdUI* pCmdUI);
+	afx_msg void OnDraw106();
+	afx_msg void OnUpdateDraw106(CCmdUI* pCmdUI);
+	afx_msg void OnDraw107();
+	afx_msg void OnUpdateDraw107(CCmdUI* pCmdUI);
+	afx_msg void OnDraw108();
+	afx_msg void OnUpdateDraw108(CCmdUI* pCmdUI);
+	afx_msg void OnDraw109();
+	afx_msg void OnUpdateDraw109(CCmdUI* pCmdUI);
+	afx_msg void OnDraw110();
+	afx_msg void OnUpdateDraw110(CCmdUI* pCmdUI);
+	afx_msg void OnDraw111();
+	afx_msg void OnUpdateDraw111(CCmdUI* pCmdUI);
+	afx_msg void OnDraw112();
+	afx_msg void OnUpdateDraw112(CCmdUI* pCmdUI);
+	afx_msg void OnDraw113();
+	afx_msg void OnUpdateDraw113(CCmdUI* pCmdUI);
+	afx_msg void OnDraw114();
+	afx_msg void OnUpdateDraw114(CCmdUI* pCmdUI);
+	afx_msg void OnDraw115();
+	afx_msg void OnUpdateDraw115(CCmdUI* pCmdUI);
+	afx_msg void OnDraw116();
+	afx_msg void OnUpdateDraw116(CCmdUI* pCmdUI);
+	afx_msg void OnDraw117();
+	afx_msg void OnUpdateDraw117(CCmdUI* pCmdUI);
+	afx_msg void OnFilter48();
+	afx_msg void OnUpdateFilter48(CCmdUI* pCmdUI);
+	afx_msg void OnFilter49();
+	afx_msg void OnUpdateFilter49(CCmdUI* pCmdUI);
+	afx_msg void OnOptions11();
+	afx_msg void OnUpdateOptions11(CCmdUI* pCmdUI);
+	afx_msg void OnOptions12();
+	afx_msg void OnUpdateOptions12(CCmdUI* pCmdUI);
+	afx_msg void OnOptions13();
+	afx_msg void OnUpdateOptions13(CCmdUI* pCmdUI);
+	afx_msg void OnOptions14();
+	afx_msg void OnUpdateOptions14(CCmdUI* pCmdUI);
+	afx_msg void OnOptions15();
+	afx_msg void OnUpdateOptions15(CCmdUI* pCmdUI);
+	afx_msg void OnOptions16();
+	afx_msg void OnUpdateOptions16(CCmdUI* pCmdUI);
+	afx_msg void OnOptions17();
+	afx_msg void OnUpdateOptions17(CCmdUI* pCmdUI);
+	afx_msg void OnOptions18();
+	afx_msg void OnUpdateOptions18(CCmdUI* pCmdUI);
+	afx_msg void OnOptions19();
+	afx_msg void OnUpdateOptions19(CCmdUI* pCmdUI);
+	afx_msg void OnOptions20();
+	afx_msg void OnUpdateOptions20(CCmdUI* pCmdUI);
+	afx_msg void OnDrawUndo();
+	afx_msg void OnUpdateDrawUndo(CCmdUI* pCmdUI);
+	afx_msg void OnFilter50();
+	afx_msg void OnUpdateFilter50(CCmdUI* pCmdUI);
+	afx_msg void OnLoadDll();
+	afx_msg void OnFilter51();
+	afx_msg void OnUpdateFilter51(CCmdUI* pCmdUI);
+	afx_msg void OnFilter52();
+	afx_msg void OnUpdateFilter52(CCmdUI* pCmdUI);
+	afx_msg void OnColorRegular();
+	afx_msg void OnUpdateColorRegular(CCmdUI* pCmdUI);
+	afx_msg void OnColorLight();
+	afx_msg void OnUpdateColorLight(CCmdUI* pCmdUI);
+	afx_msg void OnDraw118();
+	afx_msg void OnUpdateDraw118(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

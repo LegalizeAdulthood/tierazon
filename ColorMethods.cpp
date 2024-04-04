@@ -16,6 +16,7 @@
 
 void CTierazonView::OnColour0() 
 {
+	SaveForUndo();
 	nColorMethod = 0;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -33,6 +34,7 @@ void CTierazonView::OnUpdateColour0(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour01() 
 {
+	SaveForUndo();
 	nColorMethod = 1;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -50,6 +52,7 @@ void CTierazonView::OnUpdateColour01(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour02() 
 {
+	SaveForUndo();
 	nColorMethod = 2;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -67,6 +70,7 @@ void CTierazonView::OnUpdateColour02(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour03() 
 {
+	SaveForUndo();
 	nColorMethod = 3;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -84,6 +88,7 @@ void CTierazonView::OnUpdateColour03(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour04() 
 {
+	SaveForUndo();
 	nColorMethod = 4;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -101,6 +106,7 @@ void CTierazonView::OnUpdateColour04(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour05() 
 {
+	SaveForUndo();
 	nColorMethod = 5;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -118,6 +124,7 @@ void CTierazonView::OnUpdateColour05(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour06() 
 {
+	SaveForUndo();
 	nColorMethod = 6;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -135,6 +142,7 @@ void CTierazonView::OnUpdateColour06(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour07() 
 {
+	SaveForUndo();
 	nColorMethod = 7;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -152,6 +160,7 @@ void CTierazonView::OnUpdateColour07(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour8() 
 {
+	SaveForUndo();
 	nColorMethod = 8;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -169,6 +178,7 @@ void CTierazonView::OnUpdateColour8(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour9() 
 {
+	SaveForUndo();
 	nColorMethod = 9;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -186,6 +196,7 @@ void CTierazonView::OnUpdateColour9(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour10() 
 {
+	SaveForUndo();
 	nColorMethod = 10;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -203,6 +214,7 @@ void CTierazonView::OnUpdateColour10(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour11() 
 {
+	SaveForUndo();
 	nColorMethod = 11;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -220,6 +232,7 @@ void CTierazonView::OnUpdateColour11(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour12() 
 {
+	SaveForUndo();
 	nColorMethod = 12;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -237,6 +250,7 @@ void CTierazonView::OnUpdateColour12(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour13() 
 {
+	SaveForUndo();
 	nColorMethod = 13;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -254,6 +268,7 @@ void CTierazonView::OnUpdateColour13(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour14() 
 {
+	SaveForUndo();
 	nColorMethod = 14;
 	//bColorChange = TRUE;
 	bDraw = TRUE;
@@ -271,6 +286,7 @@ void CTierazonView::OnUpdateColour14(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour15() 
 {
+	SaveForUndo();
 	nColorMethod = 15;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -298,6 +314,7 @@ void CTierazonView::OnColour19()
 	*/
 	rn = 2;
 	
+	SaveForUndo();
 	nColorMethod = 19;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -325,6 +342,7 @@ void CTierazonView::OnColour20()
 	
 	rn = 2;
 
+	SaveForUndo();
 	nColorMethod = 20;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -351,6 +369,7 @@ void CTierazonView::OnColour21()
 	*/
 	rn =2;
 
+	SaveForUndo();
 	nColorMethod = 21;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -377,6 +396,7 @@ void CTierazonView::OnColour22()
 	*/
 	rn = 2;
 
+	SaveForUndo();
 	nColorMethod = 22;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -392,6 +412,7 @@ void CTierazonView::OnUpdateColour22(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour23() 
 {
+	SaveForUndo();
 	nColorMethod = 23;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -407,6 +428,7 @@ void CTierazonView::OnUpdateColour23(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour24() 
 {
+	SaveForUndo();
 	nColorMethod = 24;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -422,6 +444,7 @@ void CTierazonView::OnUpdateColour24(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour25() 
 {
+	SaveForUndo();
 	nColorMethod = 25;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -437,6 +460,7 @@ void CTierazonView::OnUpdateColour25(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour26() 
 {
+	SaveForUndo();
 	nColorMethod = 26;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -452,6 +476,7 @@ void CTierazonView::OnUpdateColour26(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour27() 
 {
+	SaveForUndo();
 	nColorMethod = 27;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -467,6 +492,7 @@ void CTierazonView::OnUpdateColour27(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour28() 
 {
+	SaveForUndo();
 	nColorMethod = 28;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -482,6 +508,7 @@ void CTierazonView::OnUpdateColour28(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour29() 
 {
+	SaveForUndo();
 	nColorMethod = 29;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -497,6 +524,7 @@ void CTierazonView::OnUpdateColour29(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour30() 
 {
+	SaveForUndo();
 	nColorMethod = 30;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -512,6 +540,7 @@ void CTierazonView::OnUpdateColour30(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour31() 
 {
+	SaveForUndo();
 	nColorMethod = 31;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -527,6 +556,7 @@ void CTierazonView::OnUpdateColour31(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour32() 
 {
+	SaveForUndo();
 	nColorMethod = 32;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -542,6 +572,7 @@ void CTierazonView::OnUpdateColour32(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour33() 
 {
+	SaveForUndo();
 	nColorMethod = 33;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -557,6 +588,7 @@ void CTierazonView::OnUpdateColour33(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour34() 
 {
+	SaveForUndo();
 	nColorMethod = 34;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -572,6 +604,7 @@ void CTierazonView::OnUpdateColour34(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour35() 
 {
+	SaveForUndo();
 	nColorMethod = 35;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -587,6 +620,7 @@ void CTierazonView::OnUpdateColour35(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour36() 
 {
+	SaveForUndo();
 	nColorMethod = 36;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -602,6 +636,7 @@ void CTierazonView::OnUpdateColour36(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour37() 
 {
+	SaveForUndo();
 	nColorMethod = 37;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -617,6 +652,7 @@ void CTierazonView::OnUpdateColour37(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour38() 
 {
+	SaveForUndo();
 	nColorMethod = 38;
 	bDraw = TRUE;
 	bLaunch = FALSE;
@@ -632,6 +668,7 @@ void CTierazonView::OnUpdateColour38(CCmdUI* pCmdUI)
 
 void CTierazonView::OnColour39() 
 {
+	SaveForUndo();
 	nColorMethod = 39;
 	bDraw = TRUE;
 	bLaunch = FALSE;

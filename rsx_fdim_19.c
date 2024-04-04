@@ -15,17 +15,13 @@
 #include "rsx_file.h"
 
 void FDimension()
-{	
-	maxit_save = maxit;
+{
 
-	/*
+	maxit_save = maxit;
 	if (bDimensionVariant)
 		i = maxit = n_color - 2;
 	else
-	*/
-	
-	i = maxit = n_color;	
-	
+		i = maxit = n_color;	
 
 	// Set up to Calculate the Fractal Dimension
 
@@ -33,11 +29,20 @@ void FDimension()
 	x_mean = 0;
 	y_mean = 0;
 
+	__real__ z_mean = 0;
+	__imag__ z_mean = 0;
+
 	// Initialize the range	with the first value
 	x_rmin = pXTemp[0];	// x range min
 	x_rmax = pXTemp[0];	// x range max
 	y_rmin = pYTemp[0];	// y range min
 	y_rmax = pYTemp[0];	// y range max
+
+	__real__ z_rmin = x_rmin;
+	__imag__ z_rmin = y_rmin;
+
+	__real__ z_rmax = x_rmax;
+	__imag__ z_rmax = y_rmax;
 
 	switch(filter)
 	{
@@ -46,10 +51,7 @@ void FDimension()
 		case 35:
 		case 37:
 		case 38:
-		case 48:
-		case 49:
-
-			if (i < 3)
+			if (i < 1)
 			{
 				rj = gj = bj = i = 0;
 				maxit = maxit_save;
@@ -58,6 +60,7 @@ void FDimension()
 			
 			for (i2 = 0 ; i2<maxit ; i2++)
 			{
+
 				// Get sum x and y
 				x_mean += pXTemp[i2];											
 				y_mean += pYTemp[i2];
@@ -77,6 +80,7 @@ void FDimension()
 				// Get max y
 				if (pYTemp[i2] > y_rmax)
 					y_rmax = pYTemp[i2];
+
 			}
 
 			x_mean = x_mean / maxit;
@@ -95,8 +99,6 @@ void FDimension()
 			y_std = sqrt(y_std / (maxit-1));		// Standard Deviation y
 
 			// Initialize complex variables
-			//cx_std = cmplx(x_std, 0);	// Complex Standard deviation	x
-			//cy_std = cmplx(y_std, 0);	// Complex Standard deviation	y
 
 			__real__ cx_std = x_std;
 			__imag__ cx_std = 0;
@@ -104,29 +106,11 @@ void FDimension()
 			__real__ cy_std = y_std;
 			__imag__ cy_std = 0;
 
-			//cFDx = cmplx (1, 0);				// Complex Fractal Dimension x
-			//cFDy = cmplx (1, 0);				// Complex Fractal Dimension y
-
-			__real__ cFDx = 1;
-			__imag__ cFDx = 0;
-
-			__real__ cFDy = 1;
-			__imag__ cFDy = 0;
-
-
-			//cRng_x = cmplx (x_rmax - x_rmin, 0);	// Complex Range x
-			//cRng_y = cmplx (y_rmax - y_rmin, 0);	// Complex Range y
-
 			__real__ cRng_x = x_rmax - x_rmin;
 			__imag__ cRng_x = 0;
 
 			__real__ cRng_y = y_rmax - y_rmin;
 			__imag__ cRng_y = 0;
-
-			//cNMAX = cmplx (maxit, 0); 
-			
-			__real__ cNMAX = maxit; 
-			__imag__ cNMAX = 0; 
 			
 			//////////////////////////////////////////////////////////////
 			// Fractal Dimension Equation ...
@@ -136,72 +120,38 @@ void FDimension()
 			// if ( 0  <= J <= .5,) D(j) = 1/(1-Ju)
 			// if (.5  <=	J <= 1.0) D(j) = 1/Ju.
 			///////////////////////////////////////////////////////////////
+			//	
+			//	steve's simple dimension = [log(R/S*N]/[log(1/N)];
+			//	R = range
+			//	S = standard deviation
+			//	N = number of samples
 
 			//////////////////////////////////////////////////////////////
 			// Real
 			////////////////////////////////////////////////////////////				
-			dm = 99;
-			da = 0;
-			nDIter_x = 1;
 			denominator = log((double)(1.0/(double)maxit));
 
 			// Calculate Fractal Dimension (real)
-			da = dm;
-			
-			//cFDx = (cRng_x/(cx_std*cNMAX*cFDx)).clog()/denominator;
-
-			t = cRng_x/(cx_std*cNMAX*cFDx);
+			t = cRng_x/(cx_std*maxit);
 			t1 = clog_t();
-			cFDx = t1/denominator;				
-			
-			dm = __real__ cFDx;
-
-			dFDx_0 = 2.0 - dm;
-
-			dFDx = __real__ cFDx;
-
-			if (dFDx <= .5)
-				dFDx = 1 / (1 - dFDx);
-			else
-				dFDx = 1 / dFDx;
+			cFDx = t1/denominator;							
+			dFDx		= __real__ cFDx;
 
 			////////////////////////////////////////////////////////////				
 			// Imaginary
 			////////////////////////////////////////////////////////////				
-			dm = 99;
-			da = 0;
-			nDIter_y = 1;
 
-			// Calculate Fractal Dimension (real)
-			da = dm;
+			// Calculate Fractal Dimension (imag)
 
-			//cFDy = (cRng_y/(cy_std*cNMAX*cFDy)).clog()/denominator;
-
-			t = cRng_y/(cy_std*cNMAX*cFDy);
+			t = cRng_y/(cy_std*maxit);
 			t1 = clog_t();
 			cFDy = t1/denominator;												
 			
-			dm = __real__ cFDy;
-
-			dFDy_0 = 2.0 - dm;
-
 			dFDy = __real__ cFDy;
-
-			if (dFDy <= .5)
-				dFDy = 1 / (1 - dFDy);
-			else
-				dFDy = 1 / dFDy;
-			////////////////////////////////////////////////////////////				
-				
-			if (bDimensionVariant)
-			{
-				xsav = dFDx;
-				ysav = dFDy;
-			}
-
+			
 			////////////////////////////////////////////////////////////
 			// Apply Fractal Dimension to a color
-
+			
 			switch (nFDOption)
 			{
 	//					case 0:
@@ -210,50 +160,49 @@ void FDimension()
 	//						break;
 			
 				case 1:
-					// Fractal Dimension Real Initial (FD_0)
-					rj = gj = bj = (dFDx_0 * 200.0 * dFactor);
-						
+					rj = dFDx * 100.0 * dFactor;
+					gj = dFDy * 100.0 * dFactor;
+					bj = rj * gj;
+					xsav = dFDx;
+					ysav = dFDy;
 					break;
 			
 				case 2:
-					// Fractal Dimension Imginary	Initial (FD_0)
-					rj = gj = bj = (dFDy_0 * 200.0 * dFactor);
+					rj = dFDx * 500.0 * dFactor;
+					gj = dFDy * 500.0 * dFactor;
+					bj = fabs(rj - gj);
+					xsav = dFDx;
+					ysav = dFDy;
 					break;
 			
 				case 3:
-					// (FD_0) Addition
-					
-					rj = ((dFDx_0+dFDy_0) * 200 * dFactor);
-					gj = ((dFDx_0) * 200 * dFactor);
-					bj = ((dFDy_0) * 200 * dFactor);						
-
+					rj = dFDx * 500.0 * dFactor;
+					gj = dFDy * 500.0 * dFactor;
+					bj = (rj + gj)/2;
+					xsav = dFDx;
+					ysav = dFDy;
 					break;
 
-				case 4:	
-
-					// (FD_0) Sum of magnitude
-					rj = ((dFDx_0*dFDx_0+dFDy_0*dFDy_0) * 200 * dFactor);
-					gj = ((dFDx_0*dFDx_0) * 200 * dFactor);
-					bj = ((dFDy_0*dFDy_0) * 200 * dFactor);
-					
+				case 4:						
+					rj = fabs(__real__ t) * 500.0 * dFactor;
+					gj = fabs(__imag__ t) * 500.0 * dFactor;
+					bj = (rj + gj)/2;
 					break;
 
-				case 5:
-					// (FD_0) Multiplication
-					rj = (dFDx_0 * dFDy_0 * 200 * dFactor);
-					gj = (dFDx_0 * 200 * dFactor);
-					bj = (dFDx_0 * 200 * dFactor);
-					
+				case 5:					
+					rj = fabs(__real__ t) * 500.0 * dFactor;
+					gj = fabs(__imag__ t) * 500.0 * dFactor;
+					bj = fabs(rj - gj)*2;
 					break;
 				
 				case 6:
 					// Fractal Dimension Real
-					rj = gj = bj = (int) (dFDx * 200.0 * dFactor);
+					rj = gj = bj = (int) (dFDx * 400.0 * dFactor);
 					break;
 			
 				case 7:
 					// Fractal Dimension Imaginary
-					rj  = gj = bj = (dFDy * 200.0 * dFactor);
+					rj  = gj = bj = (dFDy * 400.0 * dFactor);
 					break;
 			
 				case 8:
@@ -262,85 +211,26 @@ void FDimension()
 					//wsprintf (cstr, "step 1");
 					//MessageBox(NULL, cstr, "Debug", MB_OK);					
 
-					rj = ((dFDx+dFDy) * 200 * dFactor);
-					gj = ((dFDx) * 200 * dFactor);
-					bj = ((dFDy) * 200 * dFactor);
+					rj = ((dFDx+dFDy)/2 * 400 * dFactor);
+					gj = ((dFDx) * 400 * dFactor);
+					bj = ((dFDy) * 400 * dFactor);
 					break;
 
 				case 9:	
 					// FD Sum of magnitude
-					rj = ((dFDx*dFDx+dFDy*dFDy) * 200 * dFactor);
-					gj = ((dFDx*dFDx) * 200 * dFactor);
-					bj = ((dFDy*dFDy) * 200 * dFactor);
+					rj = ((dFDx*dFDx+dFDy*dFDy) * 400 * dFactor);
+					gj = ((dFDx*dFDx) * 400 * dFactor);
+					bj = ((dFDy*dFDy) * 400 * dFactor);
+
 					break;
 
 				case 10:
 					// FD Multiplication
-					rj = (dFDx * dFDy * 200 * dFactor);
-					gj = (dFDx * 200 * dFactor);
-					bj = (dFDx * 200 * dFactor);
+					rj = (dFDx * dFDy * 400 * dFactor);
+					gj = (dFDx * 400 * dFactor);
+					bj = (dFDx * 400 * dFactor);
 					break;
-					
-				case 11:
-					rj = dFDx * 200.0 * dFactor;
-					gj = dFDy * 200.0 * dFactor;
-					bj = sqrt(rj * gj + rj * gj);
-					break;
-			
-				case 12:
-					rj = dFDx * 500.0 * dFactor;
-					gj = dFDy * 500.0 * dFactor;
-					bj = fabs(rj - gj);
-					break;
-			
-				case 13:
-					rj = dFDx * 500.0 * dFactor;
-					gj = dFDy * 500.0 * dFactor;
-					bj = (rj + gj)/2;
-					break;
-
-				case 14:						
-					rj = fabs(__real__ t) * 2000.0 * dFactor;
-					gj = fabs(__imag__ t) * 2000.0 * dFactor;
-					bj = (rj + gj)/2;
-					break;
-
-				case 15:					
-					rj = fabs(__real__ t) * 2000.0 * dFactor;
-					gj = fabs(__imag__ t) * 2000.0 * dFactor;
-					bj = fabs(rj - gj)*2;
-					break;
-
-				case 16:
-					rj = fabs(__real__ cFDx) * 1000.0 * dFactor;
-					gj = fabs(__real__ cFDy) * 1000.0 * dFactor;
-					bj = sqrt(rj * gj + rj * gj);
-					break;
-					
-				case 17:
-					bj = dFDx * 1000.0 * dFactor;
-					gj = dFDy * 1000.0 * dFactor;
-					rj = gj;
-					break;
-					
-				case 18:
-					rj = fabs(__real__ t) * 2000.0 * dFactor;
-					gj = fabs(__imag__ t) * 2000.0 * dFactor;
-					bj = rj;
-					break;
-					
-				case 19:
-					rj = fabs(__real__ cFDx) * 1000.0 * dFactor;
-					gj = fabs(__real__ cFDy) * 1000.0 * dFactor;
-					bj = rj;
-					break;
-
-				case 20:
-					rj = fabs(__real__ cFDx)*fabs(__real__ cFDy) * 1000 * dFactor;
-					gj = fabs(__real__ cFDx) * 1000 * dFactor;
-					bj = fabs(__real__ cFDy) * 1000 * dFactor;
-					break;
-
+								
 				default:
 					AfxMessageBox("FD Error");
 					break;

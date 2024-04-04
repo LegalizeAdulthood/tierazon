@@ -33,24 +33,18 @@ int APIENTRY LibMain(HANDLE hInst, DWORD fdwReason, LPVOID lpReserved)
     //MessageBox(NULL, "LibMain(): DLL unloaded", "Detach", MB_OK);
 	}
 
-  return TRUE;
+	__real__ ci1 = 0.0;
+	__imag__ ci1 = 1.0;
+  
+	return TRUE;
 }
 
-RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, int dBailout, int NMAX, double cx, double cy, double zx, double zy, int _px, int _py)
+RGB_IDATA CALLBACK _formulae(double cx, double cy, double zx, double zy, int _px, int _py)
 {
 	//MessageBox(NULL, "step 1", "bug", MB_OK);
 	
-	formula			= nDistortion;	
-	filter			= nFilter;
-	bailout			= dBailout;
-	maxit				= NMAX;
-	minsize			= 1e-20;
-	maxsize			= 1e+20;
-
 	px = _px;
 	py = _py;
-
-	nColorMethod = _nColorMethod;
 
 	__real__ c	= cx;
 	__imag__ c	= cy;
@@ -79,6 +73,8 @@ RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, in
 	dStrands_HI = limit + dStrands;
   dStrands_LO = limit - dStrands;
 
+	dStrands_df = (dStrands_HI - dStrands_LO)/2;
+
   //return;
 
 	//sprintf (cstr, "1.) dStrands=%f, cx=%f, cy=%f.", dStrands, cx, cy);
@@ -97,16 +93,22 @@ RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, in
 	dStrands_cxd = dStrands_HI_cx - dStrands_LO_cx;
 	dStrands_cyd = dStrands_HI_cy - dStrands_LO_cy;
 
+	limit_cxd = dStrands_LO_cx + dStrands_cxd/2;
+	limit_cyd = dStrands_LO_cy + dStrands_cyd/2;
+
 	//sprintf (cstr, "2.) dStrands=%f, cx=%f, cy=%f.", dStrands, cx, cy);
 	//MessageBox(NULL, cstr, "Debug", MB_OK);
+			
+	//sprintf (cstr, "formula = %d", formula);
+	//MessageBox(NULL, cstr, "bug", MB_OK);
 
 	dif_save = xdif = ydif = zdif = dif = ssq1 = ssq2 = (double) bailout-1;
 		
 	n_color = 0;
 
 	//MessageBox(NULL, "step 2", "bug", MB_OK);
-
-	switch (nDistortion)
+	
+	switch (formula)
 	{
 		case 1:
 			Formula_01();
@@ -508,6 +510,74 @@ RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, in
 			Formula_100();
 			break;
 
+		case 101:
+			break;	// formula editor, do nothing
+
+		case 102:
+			//MessageBox(NULL, "step 1", "bug", MB_OK);
+			Formula_102();
+			break;
+
+		case 103:
+			Formula_103();
+			break;
+
+		case 104:
+			Formula_104();
+			break;
+
+		case 105:
+			Formula_105();
+			break;
+
+		case 106:
+			Formula_106();
+			break;
+
+		case 107:
+			Formula_107();
+			break;
+
+		case 108:
+			Formula_108();
+			break;
+
+		case 109:
+			Formula_109();
+			break;
+
+		case 110:
+			Formula_110();
+			break;
+
+		case 111:
+			Formula_111();
+			break;
+
+		case 112:
+			Formula_112();
+			break;
+
+		case 113:
+			Formula_113();
+			break;
+
+		case 114:
+			Formula_114();
+			break;
+
+		case 115:
+			Formula_115();
+			break;
+
+		case 116:
+			Formula_116();
+			break;
+
+		case 117:
+			Formula_117();
+			break;
+
 		default:
 			break;
 
@@ -515,7 +585,7 @@ RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, in
 
 	//MessageBox(NULL, "step 3", "bug", MB_OK);
 
-	if (filter) 
+	if (filter && formula != 101) 
 	{
 		__real__ z = xsav;
 		__imag__ z = ysav;
@@ -560,25 +630,31 @@ RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, in
 			ysav = -maxsize;
 	}
 
-	switch (filter)
-	{		
-		case 27:  // Check for a fractal Dimension filter
-		case 28:  // standard deviation filter
-		case 33:
-		case 34:
-		case 35:
-		case 36:
-		case 37:
-		case 38:
+	if (formula != 101)
+	{
+		switch (filter)
+		{		
+		
+			case 27:  // Check for a fractal Dimension filter
+			case 28:  // standard deviation filter
+			case 33:
+			case 34:
+			case 35:
+			case 36:
+			case 37:
+			case 38:
+			case 48:
+			case 49:
 
-			FDimension();
-			break;
+				FDimension();
+				break;
 
-		default:
-			break;
+			default:
+				break;
+		}
 	}
 
-	if (size_x <= 1024 && size_y <= 1024)
+	if (size_x <= 640 && size_y <= 480 && nUsingBuffers)
 	{
 		pXSave[px+py*size_x] = xsav;
 		pYSave[px+py*size_x] = ysav;
@@ -597,7 +673,7 @@ RGB_IDATA CALLBACK _formulae(int nDistortion, int nFilter, int _nColorMethod, in
 		bjData[px+py*size_x] = bj;
 	}
 
-	if (nColorMethod)	
+	if (nColorMethod && formula != 101)	
 		color_methods();
 	
 	//MessageBox(NULL, "step 5", "bug", MB_OK);
@@ -636,7 +712,7 @@ RGB_IDATA CALLBACK _color_update(int _px, int _py, int _nColorMethod, double cx,
 	dStrands_cxd = dStrands_HI_cx - dStrands_LO_cx;
 	dStrands_cyd = dStrands_HI_cy - dStrands_LO_cy;
 
-	if (size_x <= 1024 && size_y <= 1024)
+	if (size_x <= 640 && size_y <= 480 && nUsingBuffers)
 	{
 		xsav = pXSave[px+py*size_x];
 		ysav = pYSave[px+py*size_x];
@@ -670,9 +746,19 @@ RGB_IDATA CALLBACK _color_update(int _px, int _py, int _nColorMethod, double cx,
 	return rgbColor;
 }
 
-void CALLBACK _initialize(int _jul, int _jul_save, double _dStrands, double dBay100, double dBay1000, double dLower, double dUpper, double *_pXTemp, double *_pYTemp, double *_pXSave, double *_pYSave, double *_rjData, double *_gjData, double *_bjData, int _nRed, int _nGrn, int _nBlu, int _nRedStart, int _nGrnStart, int _nBluStart, int _nFDOption, int _bDimensionVariant, int _size_x, int _size_y)
+void CALLBACK _initialize(int nDistortion, int nFilter, int _nColorMethod, int dBailout, int NMAX, int _jul, int _jul_save, double _dStrands, double dBay100, double dBay1000, double dLower, double dUpper, double *_pXTemp, double *_pYTemp, double *_pXSave, double *_pYSave, double *_rjData, double *_gjData, double *_bjData, int _nRed, int _nGrn, int _nBlu, int _nRedStart, int _nGrnStart, int _nBluStart, int _nFDOption, int _bDimensionVariant, int _size_x, int _size_y, int _nUsingBuffers)
 {	
 	bug = 1;
+
+	formula				= nDistortion;	
+	filter				= nFilter;
+	bailout				= dBailout;
+	maxit					= NMAX;
+	minsize				= 1e-20;
+	maxsize				= 1e+20;
+	nColorMethod	= _nColorMethod;
+
+	nUsingBuffers = _nUsingBuffers;
 
 	pXTemp = _pXTemp;
 	pYTemp = _pYTemp;

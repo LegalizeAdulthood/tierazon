@@ -81,15 +81,14 @@ IDR_MAINFRAME           BITMAP  MOVEABLE PURE   "Toolbar.bmp"
 // Toolbar
 //
 
-IDR_MAINFRAME TOOLBAR DISCARDABLE  29, 15
+IDR_MAINFRAME TOOLBAR DISCARDABLE  29, 18
 BEGIN
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
+    SEPARATOR
     BUTTON      ID_FILE_SAVE_AS
     SEPARATOR
     BUTTON      ID_VIEW_MANDEL
-    BUTTON      ID_DRAW_INSIDEOUT
-    SEPARATOR
     BUTTON      ID_VIEW_JULIA
     SEPARATOR
     BUTTON      ID_VIEW_ZOOM
@@ -101,8 +100,11 @@ BEGIN
     SEPARATOR
     BUTTON      ID_DRAW_ABORT
     SEPARATOR
+    BUTTON      ID_FRACTALS_MOVIE
     BUTTON      ID_VIEW_DRAW
     BUTTON      ID_VIEW_RESET
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
 END
 
 
@@ -141,8 +143,8 @@ BEGIN
     BEGIN
         MENUITEM "Clear Rectangle",             ID_IMAGE_CLEAR
         MENUITEM "Zoom into rectangle",         ID_VIEW_ZOOM
-        MENUITEM "Draw Fractal",                ID_VIEW_MANDEL
         MENUITEM "Draw Julia",                  ID_VIEW_JULIA
+        MENUITEM "Unique Editor Dialog",        ID_DRAW_UNIQUE
         MENUITEM "Fractal Parameters",          ID_IMAGE_PARAMS
         MENUITEM "Color Controls",              ID_IMAGE_COLORPARAMETERS
         MENUITEM "Abort",                       ID_DRAW_ABORT
@@ -163,6 +165,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Save Parameters",             ID_FILE_SAVEPARAMETERS
         MENUITEM "Load Parameters",             ID_FILE_LOADPARAMETERS
+        MENUITEM "Load DLL File",               ID_LOAD_DLL
         MENUITEM SEPARATOR
         MENUITEM "Save Colors",                 ID_FILE_SAVECOLORS
         MENUITEM "Load Colors",                 ID_FILE_LOADCOLORS
@@ -234,7 +237,7 @@ BEGIN
             MENUITEM "52.) 8th order Newton flower", ID_DRAW_52
             MENUITEM "53.) 6th order Newton Mset",  ID_DRAW_53
         END
-        POPUP "NVariants"
+        POPUP "Newton Variations"
         BEGIN
             MENUITEM "36.) z=z-(z*z*z*z*c-z+c)/(4*z*z*z*c);", ID_DRAW_36
             MENUITEM "37.) z=z-(z*z*z-z+c)/(3*z*z);", ID_DRAW_37
@@ -253,7 +256,7 @@ BEGIN
             MENUITEM "88.) z=z-((z^4)-1)/(4*(z^3)); z=(z^4)*c;", ID_DRAW_88
             MENUITEM "89.) z=z-((z^5)-1)/(5*(z^4)); z=(z^5)*c;", ID_DRAW_89
         END
-        POPUP "N Variants II"
+        POPUP "Newton Variations II"
         BEGIN
             MENUITEM "62.) z=(((z^3)-z-1)/((z^3)-1)-z)*c;", ID_DRAW_62
             MENUITEM "63.) z=(((z^4)-z*z-1)/(4*z*z-1)-z)*c;", ID_DRAW_63
@@ -286,7 +289,7 @@ BEGIN
             MENUITEM "97.) z = z*z+c*(1+sqrt(z));", ID_DRAW_97
             MENUITEM "100.) real(z) += sin(real(z)); z=z*z+c;", ID_DRAW_100
         END
-        POPUP "Quartet"
+        POPUP "Quartets"
         BEGIN
             MENUITEM "80.) z=.5; z=z*z-z2*z2+c; z2=z;", ID_DRAW_80
             MENUITEM "81.) z2=2; z=z*z*z*z+z2+c; z2=z1;", ID_DRAW_81
@@ -321,28 +324,69 @@ BEGIN
             MENUITEM "59.) 5th order Newton Mset",  ID_DRAW_59
             MENUITEM "60.) 18th order Newton Mset flower", ID_DRAW_60
         END
+        POPUP "Ramon"
+        BEGIN
+            MENUITEM "102.) z = ((z*z+c-1)/(2*z+c-2))^2; [magneto 1]", 
+                                                    ID_DRAW_102
+            MENUITEM "103.) z = ((z*z*z+3*c2*z+c1)/(3*z*z+3*c2*z+c1+1))^2; [magneto 2]", 
+                                                    ID_DRAW_103
+            MENUITEM "104.) z = ((z*z+c)/(2*z))^2;", ID_DRAW_104
+            MENUITEM "111.) z = (z^2)/(1+c*(z^2));", ID_DRAW_111
+            MENUITEM "112.) z = c*cos(z);",         ID_DRAW_112
+            MENUITEM "113.) z = c*sin(z);",         ID_DRAW_113
+            MENUITEM "114.) z = c*exp(z);",         ID_DRAW_114
+            MENUITEM "115.) z=z^2+c; c=c/2+z [spider]", ID_DRAW_115
+            MENUITEM "116.) z = (c/sin(z))^2;",     ID_DRAW_116
+            MENUITEM "117.) z = (c/cos(z))^2;",     ID_DRAW_117
+        END
+        POPUP "More Fractals"
+        BEGIN
+            MENUITEM "105.) 3rd order Newton/ Mset [figure 8]", ID_DRAW_105
+            MENUITEM "106.) 5th order N/Mset",      ID_DRAW_106
+            MENUITEM "107.) z1 = z; z = sin(z) - c; c = 1/(z*50); [quartet]", 
+                                                    ID_DRAW_107
+            MENUITEM "108.) z=(z*c)/(1+z)+c; [Talis II]", ID_DRAW_108
+            MENUITEM "109.) z=(c+z*z*c)/(1-z*z*c);", ID_DRAW_109
+            MENUITEM "110.) z = (c+(z^6))/(1+(z^2));", ID_DRAW_110
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Unique Editor Dialog",        ID_DRAW_UNIQUE
+        MENUITEM "101.) M-Set Method",          ID_DRAW_101
+        MENUITEM "118.) N-Set Method",          ID_DRAW_118
+        MENUITEM SEPARATOR
+        MENUITEM "Undo",                        ID_DRAW_UNDO
     END
-    POPUP "Filter0-14"
+    POPUP "Filters-1"
     BEGIN
         MENUITEM "0.) None",                    ID_FILTER_0
-        MENUITEM "01.) Square bubbles",         ID_FILTER_01
-        MENUITEM "02.) Stalks I and bubbles",   ID_FILTER_02
-        MENUITEM "03.) Moving Average I",       ID_FILTER_03
-        MENUITEM "04.) Moving Average II",      ID_FILTER_04
-        MENUITEM "05.) [Linas Vepstas] n = (n-log(log(sum_sqrs_z()))/log(2))", 
-                                                ID_FILTER_05
-        MENUITEM "06.) Bubbles I [F1] and the log(log(..)) algorithm [F2]", 
-                                                ID_FILTER_06
-        MENUITEM "07.) Dual Bubbles I",         ID_FILTER_07
-        MENUITEM "08.) Bubbles II",             ID_FILTER_08
-        MENUITEM "09.) Stalks II",              ID_FILTER_09
+        MENUITEM SEPARATOR
+        MENUITEM "01.) 30*pow((1-d_real/dStrands),n_color); [stalks]", 
+                                                ID_FILTER_01
+        MENUITEM "09.) 100*pow((1-d_real/dStrands),n_color); [stalks II]", 
+                                                ID_FILTER_09
+        MENUITEM "39.) x-ray Stalks",           ID_FILTER_39
+        MENUITEM "50.) 100*(1-(zx/zy)/dStrands); [Jette]", ID_FILTER_50
+        MENUITEM SEPARATOR
+        MENUITEM "08.) 10*pow((1-temp/dStrands),n_color); [bubbles II]", 
+                                                ID_FILTER_08
+        MENUITEM "02.) 5*pow((1-temp/dStrands),n_color); [stalks && bubbles]", 
+                                                ID_FILTER_02
+        MENUITEM "07.) 30*pow((1 - zx*zx/dStrands),n_color); [dual bubbles]", 
+                                                ID_FILTER_07
+        MENUITEM "40.) x-ray Bubbles",          ID_FILTER_40
+        MENUITEM "29.) Stalks && Square Bubbles I", ID_FILTER_29
+        MENUITEM "30.) Stalks && Square Bubbles II", ID_FILTER_30
+        MENUITEM SEPARATOR
         MENUITEM "10.) Rings I",                ID_FILTER_10
         MENUITEM "11.) Rings II, mod 2",        ID_FILTER_11
         MENUITEM "12.) Rings III, mod 2",       ID_FILTER_12
+        MENUITEM "41.) x-ray Rings",            ID_FILTER_41
+        MENUITEM SEPARATOR
         MENUITEM "13.) Hi Lo Strands I",        ID_FILTER_13
         MENUITEM "14.) Hi Lo Rings",            ID_FILTER_14
+        MENUITEM "42.) x-ray Hi/ Lo Stalks",    ID_FILTER_42
     END
-    POPUP "Filter15-26"
+    POPUP "Filters-2"
     BEGIN
         MENUITEM "15.) abs(sin(x*x*100)*abs(sin(y*y*100)*30 && log(log(...))", 
                                                 ID_FILTER_15
@@ -363,35 +407,67 @@ BEGIN
                                                 ID_FILTER_25
         MENUITEM "26.) atan & bubbles VI, factor 2", ID_FILTER_26
         MENUITEM "28.) Standard Deviation",     ID_FILTER_28
-        MENUITEM "29.) Stalks & Bubbles I",     ID_FILTER_29
-        MENUITEM "30.) Stalks & Bubbles II, [earl hindrichs]", ID_FILTER_30
-        MENUITEM "31.) Weights [earl hinrichs]", ID_FILTER_31
+        MENUITEM "31.) Weights",                ID_FILTER_31
         MENUITEM "32.) Weights II",             ID_FILTER_32
+        MENUITEM SEPARATOR
+        MENUITEM "44.) diamonds",               ID_FILTER_44
+        MENUITEM "45.) wolf",                   ID_FILTER_45
+        MENUITEM "46.) bubbles IV",             ID_FILTER_46
+        MENUITEM "47.) Bubbles V",              ID_FILTER_47
     END
-    POPUP "F-Dimension"
+    POPUP "Filters-3"
     BEGIN
         MENUITEM "27.) Iterations FDimensions", ID_FILTER_27
         MENUITEM "33.) Stalks FDimension",      ID_FILTER_33
         MENUITEM SEPARATOR
+        MENUITEM "35.) Hi/ Lo Stalks FDimension", ID_FILTER_35
+        MENUITEM "37.) Hi/ Lo Stalks FDimension II", ID_FILTER_37
+        MENUITEM "38.) atan FDimension",        ID_FILTER_38
+        MENUITEM "48.) FD Bubbles",             ID_FILTER_48
+        MENUITEM "49.) FD Bubbles II",          ID_FILTER_49
+        MENUITEM SEPARATOR
+        MENUITEM "Dimension Variant",           ID_DIMENSION_VARIANT
+        MENUITEM SEPARATOR
+        MENUITEM "34.) Stalks Standard Deviation", ID_FILTER_34
+        MENUITEM "36.) Hi/ Lo Stalks Std Deviation", ID_FILTER_36
+        MENUITEM SEPARATOR
+        MENUITEM "43.) atan counting",          ID_FILTER_43
+        MENUITEM SEPARATOR
+        MENUITEM "03.) Moving Average I",       ID_FILTER_03
+        MENUITEM "04.) Moving Average II",      ID_FILTER_04
+        MENUITEM SEPARATOR
+        MENUITEM "05.) [Linas Vepstas] n = (n-log(log(sum_sqrs_z()))/log(2))", 
+                                                ID_FILTER_05
+        MENUITEM "06.) Bubbles I [F1] and the log(log(..)) algorithm [F2]", 
+                                                ID_FILTER_06
+        MENUITEM SEPARATOR
+        MENUITEM "51.) Stalks && Bubbles I",    ID_FILTER_51
+        MENUITEM "52.) Stalk && Bubbles II",    ID_FILTER_52
+    END
+    POPUP "FD-Options"
+    BEGIN
         MENUITEM "1.) FD_0 of x",               ID_OPTIONS_1
         MENUITEM "2.) FD_0 of y",               ID_OPTIONS_2
         MENUITEM "3.) FD_0x + FD_0y ",          ID_OPTIONS_3
         MENUITEM "4.) FD_0 Sum of Squares",     ID_OPTIONS_4
         MENUITEM "5.) FD_0x * FD_0y ",          ID_OPTIONS_5
-        MENUITEM SEPARATOR
+        MENUITEM "",                            3
         MENUITEM "6.) FD of x",                 ID_OPTIONS_6
         MENUITEM "7.) FD of y",                 ID_OPTIONS_7
         MENUITEM "8.) FD_x + FD_y ",            ID_OPTIONS_8
         MENUITEM "9.) FD Sum of Squares",       ID_OPTIONS_9
         MENUITEM "10.) FD_x * FD_y ",           ID_OPTIONS_10
-        MENUITEM SEPARATOR
-        MENUITEM "Dimension Variant",           ID_DIMENSION_VARIANT
-        MENUITEM SEPARATOR
-        MENUITEM "34.) Stalks Standard Deviation", ID_FILTER_34
-        MENUITEM "35.) Hi/ Lo Stalks FDimension", ID_FILTER_35
-        MENUITEM "36.) Hi/ Lo Stalks Std Deviation", ID_FILTER_36
-        MENUITEM "37.) Hi/ Lo Stalks FDimension II", ID_FILTER_37
-        MENUITEM "38.) atan FDimension",        ID_FILTER_38
+        MENUITEM "",                            4
+        MENUITEM "11.) sum of squares",         ID_OPTIONS_11
+        MENUITEM "12.) difference",             ID_OPTIONS_12
+        MENUITEM "13.) average FD",             ID_OPTIONS_13
+        MENUITEM "14.) average T",              ID_OPTIONS_14
+        MENUITEM "15.) difference T * 2",       ID_OPTIONS_15
+        MENUITEM "16.) sum of squares sFD",     ID_OPTIONS_16
+        MENUITEM "17.) gray dFD",               ID_OPTIONS_17
+        MENUITEM "18.) gray T",                 ID_OPTIONS_18
+        MENUITEM "19.) gray sFD",               ID_OPTIONS_19
+        MENUITEM "20.) sum of squares II sFD",  ID_OPTIONS_20
     END
     POPUP "Color-1"
     BEGIN
@@ -458,25 +534,6 @@ BEGIN
         MENUITEM "29.) RGB + Filter",           ID_COLOUR_29
         MENUITEM "30.) GRB + Filter",           ID_COLOUR_30
     END
-    POPUP "Convolve"
-    BEGIN
-        MENUITEM "Dialog",                      ID_CONVOLUTION_DIALOG
-        MENUITEM SEPARATOR
-        MENUITEM "Anti-Alias",                  ID_CONVOLVE_ANTIALIAS
-        MENUITEM SEPARATOR
-        MENUITEM "Trace Contour",               ID_CONVOLUTION_TRACECONTOUR
-        MENUITEM SEPARATOR
-        MENUITEM "Apply",                       ID_FILTER_CONVOLUTION_APPLY
-        MENUITEM "Undo",                        ID_FILTER_CONVOLUTION_UNDO
-        MENUITEM "Auto",                        ID_FILTER_CONVOLUTION_AUTO
-        MENUITEM "Stop",                        ID_FILTER_CONVOLUTION_STOP
-        MENUITEM SEPARATOR
-        MENUITEM "Average",                     ID_IMAGE_AVERAGE
-        MENUITEM "Sharpen",                     ID_IMAGE_SHARPEN
-        MENUITEM "Edge Detection",              ID_IMAGE_EDGEDETECTION
-        MENUITEM "Emboss",                      ID_IMAGE_EMBOSS
-        MENUITEM "Blur",                        ID_IMAGE_BLUR
-    END
     POPUP "Color"
     BEGIN
         MENUITEM "Cycle",                       ID_SHIFT_START
@@ -492,6 +549,29 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Gray Scale",                  ID_COLOR_GRAYSCALE
         MENUITEM "Invert ",                     ID_COLOR_INVERT
+        MENUITEM SEPARATOR
+        MENUITEM "Regular Color Mode",          ID_COLOR_REGULAR
+        MENUITEM "I See Da Light Mode",         ID_COLOR_LIGHT
+    END
+    POPUP "Convolve"
+    BEGIN
+        MENUITEM "Dialog",                      ID_CONVOLUTION_DIALOG
+        MENUITEM SEPARATOR
+        MENUITEM "Anti-Alias",                  ID_CONVOLVE_ANTIALIAS
+        MENUITEM "Auto Anti-Alias",             ID_CONVOLVE_AUTO_ANTIALIAS
+        MENUITEM SEPARATOR
+        MENUITEM "Trace Contour",               ID_CONVOLUTION_TRACECONTOUR
+        MENUITEM SEPARATOR
+        MENUITEM "Apply",                       ID_FILTER_CONVOLUTION_APPLY
+        MENUITEM "Undo",                        ID_FILTER_CONVOLUTION_UNDO
+        MENUITEM "Auto",                        ID_FILTER_CONVOLUTION_AUTO
+        MENUITEM "Stop",                        ID_FILTER_CONVOLUTION_STOP
+        MENUITEM SEPARATOR
+        MENUITEM "Average",                     ID_IMAGE_AVERAGE
+        MENUITEM "Sharpen",                     ID_IMAGE_SHARPEN
+        MENUITEM "Edge Detection",              ID_IMAGE_EDGEDETECTION
+        MENUITEM "Emboss",                      ID_IMAGE_EMBOSS
+        MENUITEM "Blur",                        ID_IMAGE_BLUR
     END
     POPUP "&View"
     BEGIN
@@ -507,6 +587,14 @@ BEGIN
         MENUITEM "Orientation",                 ID_VIEW_ORIENT
         MENUITEM "Draw",                        ID_VIEW_DRAW
         MENUITEM "Reset",                       ID_VIEW_RESET
+        MENUITEM SEPARATOR
+        MENUITEM "Movie",                       ID_FRACTAL_STARTGENERATINGAMOVIE
+
+        MENUITEM "Movie Dialog",                ID_FRACTALS_MOVIE
+        MENUITEM "Video Player",                ID_FRACTAL_VIDEOPLAYER
+        MENUITEM SEPARATOR
+        MENUITEM "Julia Video Option",          ID_VIEW_JULIAVIDEO
+        MENUITEM "Orientation Video Option",    ID_VIEW_ORIENTATIONVIDEO
     END
     POPUP "&Window"
     BEGIN
@@ -553,21 +641,24 @@ END
 // Dialog
 //
 
-IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 254, 93
+IDD_ABOUTBOX DIALOG DISCARDABLE  0, 0, 264, 124
 STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About Tiera-Zon"
 FONT 8, "MS Sans Serif"
 BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,59,20,20
+    ICON            IDR_MAINFRAME,IDC_STATIC,20,55,20,20
     CTEXT           "Copyright (C) 1998 by Stephen C. Ferguson",IDC_STATIC,
-                    53,46,151,12,WS_BORDER
-    DEFPUSHBUTTON   "Tiera-Zon, Jungle Fractals version 1.0",IDOK,21,8,212,
-                    20,WS_GROUP
-    LTEXT           "http://home1.gte.net/itriazon/",IDC_STATIC,78,62,96,8
-    LTEXT           "email: itriazon@gte.net",IDC_STATIC,90,73,72,8
-    ICON            IDR_TIERAZTYPE,IDC_STATIC,218,59,20,20
-    LTEXT           "Named after the Tiera Batfish and the AmaZon Jungle",
-                    IDC_STATIC,42,32,170,8
+                    56,26,151,12
+    DEFPUSHBUTTON   "OK",IDOK,191,58,57,15,WS_GROUP
+    LTEXT           "http://home.HiWAAY.net/~stephenf/",IDC_STATIC,70,39,120,
+                    8
+    LTEXT           "email: stephenf@HiWAAY.net",IDC_STATIC,79,52,105,8
+    ICON            IDR_TIERAZTYPE,IDC_STATIC,49,55,20,20
+    LTEXT           "Physical Memory =",IDC_STATIC,27,90,67,8
+    LTEXT           "Mem",IDC_PHYSICAL_MEM,96,90,90,8
+    LTEXT           "Free Disk Space =",IDC_STATIC,27,100,68,8
+    LTEXT           "Static",IDC_DISK_SPACE,98,100,93,8
+    LTEXT           "Tiera-Zon version 2.7",IDC_STATIC,20,14,68,8
 END
 
 IDD_DIMENSIONS DIALOG DISCARDABLE  0, 0, 73, 191
@@ -641,38 +732,34 @@ BEGIN
     EDITTEXT        IDC_UPPER,236,80,40,14,ES_AUTOHSCROLL
 END
 
-IDD_GRADIENT DIALOG DISCARDABLE  240, 75, 230, 87
+IDD_GRADIENT DIALOG DISCARDABLE  240, 75, 114, 148
 STYLE DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
     WS_SYSMENU
-CAPTION "Tierazon Jungle Controls"
+CAPTION "Color Controls"
 FONT 8, "Arial"
 BEGIN
-    EDITTEXT        IDC_INC_RED,26,11,28,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_INC_GREEN,26,24,28,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_INC_BLUE,26,37,28,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_START_RED,86,11,28,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_START_GREEN,86,24,28,12,ES_AUTOHSCROLL
-    EDITTEXT        IDC_START_BLUE,86,37,28,12,ES_AUTOHSCROLL
-    GROUPBOX        "Iteration Starting values, 0 to 255",IDC_RED,62,2,158,
-                    51
-    LTEXT           "Red",IDC_RED,67,13,14,8
-    LTEXT           "Grn",IDC_RED,67,26,14,8
-    LTEXT           "Blu",IDC_RED,68,39,14,8
-    GROUPBOX        "Steps, 0 to 255",IDC_RED,3,2,56,51
-    LTEXT           "Red",IDC_RED,9,13,14,8
-    LTEXT           "Grn",IDC_RED,9,26,14,8
-    LTEXT           "Blu",IDC_RED,9,39,14,8
-    PUSHBUTTON      "Apply",IDOK,175,72,39,12
-    PUSHBUTTON      "Invert",IDC_INVERT,174,56,39,12
-    PUSHBUTTON      "Forward",IDC_FORWARD,120,56,39,12
-    PUSHBUTTON      "Reverse",IDC_REVERSE,120,72,39,12
-    PUSHBUTTON      "Cycle",IDC_CYCLE,69,72,39,12
-    SCROLLBAR       IDC_REDSCROLL,119,13,94,8
-    SCROLLBAR       IDC_GRNSCROLL,119,26,94,8
-    SCROLLBAR       IDC_BLUSCROLL,119,39,94,8
-    ICON            IDR_MAINFRAME,IDC_RED,37,60,20,20
-    ICON            IDR_TIERAZTYPE,IDC_RED,7,60,20,20
-    LTEXT           "Status",IDC_STATUS,70,59,38,8
+    EDITTEXT        IDC_INC_RED,27,14,28,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_INC_GREEN,27,27,28,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_INC_BLUE,27,40,28,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_START_RED,70,14,28,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_START_GREEN,70,27,28,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_START_BLUE,70,41,28,12,ES_AUTOHSCROLL
+    GROUPBOX        "Starting",IDC_RED,63,5,44,51
+    LTEXT           "Red",IDC_RED,58,133,14,8
+    LTEXT           "Grn",IDC_RED,77,133,14,8
+    LTEXT           "Blu",IDC_RED,96,133,14,8
+    GROUPBOX        "Steps, 0 to 255",IDC_RED,4,5,56,51
+    LTEXT           "Red",IDC_RED,10,16,14,8
+    LTEXT           "Grn",IDC_RED,10,29,14,8
+    LTEXT           "Blu",IDC_RED,10,42,14,8
+    PUSHBUTTON      "Apply",IDOK,9,128,39,12
+    PUSHBUTTON      "Invert",IDC_INVERT,9,94,39,12
+    PUSHBUTTON      "Forward",IDC_FORWARD,9,61,39,12
+    PUSHBUTTON      "Reverse",IDC_REVERSE,9,77,39,12
+    PUSHBUTTON      "Cycle",IDC_CYCLE,9,111,39,12
+    SCROLLBAR       IDC_BLUSCROLL,96,62,10,69,SBS_VERT
+    SCROLLBAR       IDC_GRNSCROLL,78,62,10,69,SBS_VERT
+    SCROLLBAR       IDC_REDSCROLL,60,62,10,69,SBS_VERT
 END
 
 IDD_ORIENT DIALOG DISCARDABLE  0, 0, 251, 74
@@ -719,6 +806,75 @@ BEGIN
     PUSHBUTTON      "AUTO",IDC_AUTO,101,87,34,14
     PUSHBUTTON      "Stop",IDC_STOP,143,87,34,14
     GROUPBOX        "",IDC_STATIC,95,78,88,29
+END
+
+IDD_UNIQUE DIALOG DISCARDABLE  0, 0, 247, 107
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Unique Formulae Parser"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_FORMULAE,4,5,238,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_U_REAL,29,44,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_V_REAL,29,63,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_W_REAL,29,83,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_U_IMAG,78,44,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_V_IMAG,78,63,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_W_IMAG,78,83,40,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,134,87,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,192,87,50,14
+    LTEXT           "u",IDC_STATIC,12,46,8,8
+    LTEXT           "v",IDC_STATIC,12,64,8,8
+    LTEXT           "w",IDC_STATIC,12,84,8,8
+    LTEXT           "Real",IDC_STATIC,33,32,16,8
+    LTEXT           "Imaginary",IDC_STATIC,82,32,31,8
+    GROUPBOX        "Constants",IDC_STATIC,5,23,121,78
+    LTEXT           "Parser Developed by:",IDC_STATIC,137,26,74,8
+    LTEXT           "Gerry Myers",IDC_STATIC,137,37,38,8
+    LTEXT           "myersge@hiwaay.net",IDC_STATIC,137,48,77,8
+    CONTROL         "M-Set",IDC_RADIO_M,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE | WS_GROUP,149,68,33,10
+    CONTROL         "N-Set",IDC_RADIO_N,"Button",BS_AUTORADIOBUTTON | 
+                    BS_PUSHLIKE,192,68,34,10
+END
+
+IDD_MOVIE DIALOG DISCARDABLE  120, 200, 297, 107
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Generate a Movie"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_X_Start,68,17,60,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_Y_Start,142,17,60,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_Magnif_Start,217,17,60,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_X_Finish,67,34,60,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_Y_Finish,142,33,60,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_Magnif_Finish,217,33,60,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_WIDTH,46,60,35,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_FRAMES,137,61,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_MOVIERATE,229,61,22,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_Height,46,77,35,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_Output_File,137,77,61,14,ES_AUTOHSCROLL
+    LTEXT           "Start ->",IDC_STATIC,8,21,24,8
+    LTEXT           "Finish ->",IDC_STATIC,7,36,27,8
+    LTEXT           "Width =",IDC_STATIC,9,62,27,9
+    LTEXT           "Height =",IDC_STATIC,9,79,28,9
+    LTEXT           "Zooming algorithm Mp=Ms*(Mf/Ms)^(p/n) by Dr.med. Juergen Sammler, jsammle@gwdg.de",
+                    IDC_STATIC,5,95,286,8
+    PUSHBUTTON      "Cancel",ID_CANCELMOVIE,259,60,30,14
+    PUSHBUTTON      "Close",IDCANCEL,215,78,30,14
+    DEFPUSHBUTTON   "Start",IDOK,259,78,30,14
+    LTEXT           "Frames =",IDC_STATIC,101,63,32,9
+    CONTROL         "",IDC_LOCKSTART,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    42,20,10,8
+    CONTROL         "",IDC_LOCKFINISH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    42,36,8,8
+    GROUPBOX        "",IDC_STATIC,2,2,290,54
+    GROUPBOX        "Lock",IDC_STATIC,35,8,23,44,BS_CENTER
+    GROUPBOX        "X Center",IDC_STATIC,62,8,72,44,BS_CENTER
+    GROUPBOX        "Y Center",IDC_STATIC,138,8,69,44,BS_CENTER
+    GROUPBOX        "Magnification",IDC_STATIC,211,8,73,44,BS_CENTER
+    LTEXT           "Output File =",IDC_STATIC,91,79,40,8
+    LTEXT           "Playback",IDC_STATIC,188,58,30,8
+    LTEXT           "Frames/Sec",IDC_STATIC,187,66,40,8
 END
 
 
@@ -776,9 +932,9 @@ BEGIN
     IDD_ABOUTBOX, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 247
+        RIGHTMARGIN, 257
         TOPMARGIN, 7
-        BOTTOMMARGIN, 86
+        BOTTOMMARGIN, 117
     END
 
     IDD_DIMENSIONS, DIALOG
@@ -968,6 +1124,20 @@ STRINGTABLE DISCARDABLE
 BEGIN
     ID_FILTER_30            "Stalks & Bubbles II, [earl hindrichs]"
     ID_FILTER_31            "WEIGHTS"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    CG_IDS_PHYSICAL_MEM     "%lu KB"
+    CG_IDS_DISK_SPACE       "%lu KB Free on %c:"
+    CG_IDS_DISK_SPACE_UNAVAIL "Unavailable"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    ID_FRACTALS_MOVIE       "Movie Dialog Parameters\nMovie Dialog Parameters"
+    ID_CONVOLVE_AUTO_ANTIALIAS 
+                            "Automatically Anti-Alias\nAutomatically Anti-Alias"
 END
 
 #endif    // English (U.S.) resources

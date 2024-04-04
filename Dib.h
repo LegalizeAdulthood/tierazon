@@ -80,6 +80,7 @@ public:
 	BOOL SpatialOperator (DWORD Xpix, DWORD Ypix, int NMAX, BOOL bTraceContour);
 	BOOL CopyTemp();
 	BOOL ReduceDIBSize();
+	BYTE* Get_m_pDIB();
 
 // Implementation
 public:

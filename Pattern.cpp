@@ -9,9 +9,9 @@
 #include <math.h>
 #include "external.h"
 
-void CTierazonView::init_stdcall(DLLINIT func, int _jul, int _jul_save, double _dStrands, double dBay100, double dBay1000, double dLower, double dUpper, double *pXTemp, double *pYTemp, double *pXSave, double *pYSave, double *rjData, double *gjData, double *bjData, int nRed, int nGrn, int nBlu, int nRedStart, int nGrnStart, int nBluStart, int nFDOption, int bDimensionVariant, int size_x, int size_y)
+void CTierazonView::init_stdcall(DLLINIT func, int nFormula, int nFilter, int nColorMethod, int dBailout, int NMAX, int _jul, int _jul_save, double _dStrands, double dBay100, double dBay1000, double dLower, double dUpper, double *pXTemp, double *pYTemp, double *pXSave, double *pYSave, double *rjData, double *gjData, double *bjData, int nRed, int nGrn, int nBlu, int nRedStart, int nGrnStart, int nBluStart, int nFDOption, int bDimensionVariant, int size_x, int size_y, int nUsingBuffers)
 {
- (*func) (jul, jul_save, dStrands, dBay100, dBay1000, dLower, dUpper, pXTemp, pYTemp, pXSave, pYSave, rjData, gjData, bjData, nRed, nGrn, nBlu, nRedStart, nGrnStart, nBluStart, nFDOption, bDimensionVariant, size_x, size_y);
+	(*func) (nFormula, nFilter, nColorMethod, dBailout, NMAX, jul, jul_save, dStrands, dBay100, dBay1000, dLower, dUpper, pXTemp, pYTemp, pXSave, pYSave, rjData, gjData, bjData, nRed, nGrn, nBlu, nRedStart, nGrnStart, nBluStart, nFDOption, bDimensionVariant, size_x, size_y, nUsingBuffers);
 }
 
 RGB_IDATA CTierazonView::color_stdcall(DLLCOLOR func, int px, int py, int nColorMethod, double cx, double cy, double zx, double zy)
@@ -32,7 +32,12 @@ void CTierazonView::DrawPattern()  // Step 1
 			bDraw = FALSE;
 			bAbort = FALSE;
 			bTracker = FALSE;
-			bGlobalDraw = FALSE;
+			//GetDocument()->SetModifiedFlag(TRUE);
+
+			if (!bStartMovie)
+				bGlobalDraw = FALSE;
+			      
+			bZoomingMode = FALSE;
 
 			nColorMethodSave = nColorMethod;
 			bInitialized = TRUE;
@@ -40,7 +45,7 @@ void CTierazonView::DrawPattern()  // Step 1
 			nDistortionSave = nDistortion;
 			nFDOptionSave = nFDOption;
 
-			if (dim.cx <= 1024 && dim.cy <= 1024)			
+			if (dim.cx <= 640 && dim.cy <= 480 && nUsingBuffers)			
 				bInitialized = TRUE;
 
 			jul_save = jul;
@@ -82,12 +87,29 @@ void CTierazonView::DrawPattern()  // Step 1
 				{
 					OnConvolveReduce();
 				}
+
+				bAutoAntialias_Init = FALSE;
 			}						      
-			Invalidate(FALSE);
+
+			if (bAutoAntialias_Init)
+			{
+				//bAutoAntialias = FALSE;
+				OnConvolveAntialias();
+			}
+			else
+				Invalidate(FALSE);
 		}
 	}
 	else
-		bGlobalDraw = FALSE;
+	{
+		if (bStartMovie)
+		{
+			GenerateAMovie();
+			bGlobalDraw = TRUE;
+		}
+		else
+			bGlobalDraw = FALSE;
+	}
 }
 
 void CTierazonView::adjust_coords()
@@ -125,11 +147,31 @@ void CTierazonView::adjust_coords()
 
 void CTierazonView::GeneratePattern()
 {	
+	CTierazonDoc* pDoc = GetDocument();
+
 	if (bLaunch)
 	{
 		LaunchPattern(); 
    	return;
   }  
+
+	if (bAutoAntialias && !bAutoAntialias_Init)
+	{
+		dim.cx = dim.cx*2;
+		dim.cy = dim.cy*2;
+
+		global_width = dim.cx;
+		global_height = dim.cy;
+
+		pDoc->m_sizeDoc	= dim;
+		bAutoAntialias_Init = TRUE;
+
+		// Create a new DIB
+		if (!pDoc->m_dib.CreateDIB((DWORD) dim.cx, (DWORD) dim.cy))	// Create a bitmap
+		{
+			AfxMessageBox("Error Creating DIB");
+		}
+	}
 
 	// Initialize some variables, Initialize Drawing
 	bLaunch = TRUE;
@@ -153,7 +195,7 @@ void CTierazonView::GeneratePattern()
 	
   Col = 0;
 
-	if (dim.cx > 1024 && dim.cy > 1024)
+	if ((dim.cx > 640 && dim.cy > 480) || !nUsingBuffers)
 	{
 		Row = RowMax;
 	}
@@ -170,9 +212,9 @@ void CTierazonView::GeneratePattern()
 	
 	///////////////////////////////////////////////////////////
 	// Initialize color cycling variable
-	if (!bInitialized)
+	if (!bInitialized  && nUsingBuffers)
 	{
-		if (dim.cx <= 1024 && dim.cy <= 1024)
+		if (dim.cx <= 640 && dim.cy <= 480 && nUsingBuffers)
 		{				
 			if (bRed)
 				delete bRed;
@@ -269,6 +311,8 @@ void CTierazonView::GeneratePattern()
 		case 36:
 		case 37:
 		case 38:
+		case 48:
+		case 49:
 
 			bMFilter = TRUE;
 			break;
@@ -294,10 +338,17 @@ void CTierazonView::GeneratePattern()
 		}
 	}			
 
-	//if (!(nColorMethod != nColorMethodSave && bInitialized))
-
 	///////////////////////////////////////////////////////////
-	init_stdcall(lpfnInitialize, jul, jul_save, dStrands, dBay100, dBay1000, dLower, dUpper, pXTemp, pYTemp, pXSave, pYSave, rjData, gjData, bjData, nRed, nGrn, nBlu, nRedStart, nGrnStart, nBluStart, nFDOption, bDimensionVariant, size_x, size_y);
+	init_stdcall(lpfnInitialize, nDistortion,
+							 nFilter, nColorMethod, dBailout,
+							 NMAX,jul, jul_save, dStrands, 
+							 dBay100, dBay1000, dLower, dUpper, 
+							 pXTemp, pYTemp, pXSave, pYSave, 
+							 rjData, gjData, bjData, 
+							 nRed, nGrn, nBlu, 
+							 nRedStart, nGrnStart, nBluStart, 
+							 nFDOption, bDimensionVariant, size_x, size_y,
+							 nUsingBuffers);
 	///////////////////////////////////////////////////////////
 
 	// Launch The Drawing Pattern for the first time
@@ -309,12 +360,15 @@ void CTierazonView::LaunchPattern()
 	// Mandelbrot Fractal pattern
 	TestPattern();
 
-	if (dim.cx > 1024 && dim.cy > 1024)
-	{		
-		if ((Row % 32) == 0)
-			Invalidate(FALSE);					
+	//if (bAutoAntialias)
+		//return;
 
-		if ((Row % 2) == 0)
+	if ((dim.cx > 640 && dim.cy > 480)  || !nUsingBuffers)
+	{		
+		if ((Row % 32) == 0 && !bAutoAntialias)
+			Invalidate(FALSE);					///// ?????????
+
+		if ((Row % 32) == 0)  // 2
 		{
 			Window_Pane(Row);
 		}
@@ -334,7 +388,9 @@ void CTierazonView::LaunchPattern()
 		kr++;
 		
 		Window_Pane(UBANDS - kr);
-		Invalidate(FALSE);					
+
+		if(!bAutoAntialias)
+			Invalidate(FALSE);					
 	
 		if (kr >= UBANDS)
 		{
@@ -352,7 +408,7 @@ void CTierazonView::TestPattern()
 {
 	CTierazonDoc* pDoc = GetDocument();
 	
-	if (dim.cx > 1024 && dim.cy > 1024)
+	if ((dim.cx > 640 && dim.cy > 480) || !nUsingBuffers)
 	{
 		py = Row;
 		for (px = 0; px < dim.cx ; px++)
@@ -407,7 +463,8 @@ void CTierazonView::UpdateColorMethod()
 	rgbColor = color_stdcall(lpfnColorUpdate, px, py, nColorMethod, c.real(), c.imag(), z.real(), z.imag());			
 	/////////////////////////////////////////////////////*/
 	
-	i = iIter_Data[px + py*pDoc->m_sizeDoc.cx];
+	if (dim.cx <= 640 && dim.cy <= 480 && nUsingBuffers)
+		i = iIter_Data[px + py*pDoc->m_sizeDoc.cx];
 
 	Returning_From_DLL();
 }
@@ -520,7 +577,7 @@ void CTierazonView::TestPatternSub()
 		z=cmplx(0, 0);
 	
 	//if (nColorMethod != nColorMethodSave && bInitialized && nColorMethodSave != 0)
-	if (nDistortion == nDistortionSave && nFilter == nFilterSave && nFDOption == nFDOptionSave && bInitialized && nColorMethod )
+	if (nDistortion == nDistortionSave && nFilter == nFilterSave && nFDOption == nFDOptionSave && bInitialized && nColorMethod && !bZoomingMode)
 		UpdateColorMethod();
 	else					
 		TestEquations();
@@ -572,8 +629,10 @@ void CTierazonView::OnDraw1()
 	dMagnification = 1;
 	CRMID = 0;
 	CIMID = 0;
+  
+	ActiveTitle = "1.) ";
 
-  ActiveTitle = "1.) ";
+	SaveForUndo();
 	nDistortion = 1;
 
   GoDoFractal();
@@ -592,6 +651,7 @@ void CTierazonView::OnDraw2()
 	CIMID = 0;
 
   ActiveTitle = "2.) ";
+	SaveForUndo();
 	nDistortion = 2;
 
   GoDoFractal();
@@ -610,6 +670,7 @@ void CTierazonView::OnDraw3()
 	CIMID = 0;
 
   ActiveTitle = "3.) ";
+	SaveForUndo();
 	nDistortion = 3;
 
   GoDoFractal();
@@ -628,6 +689,7 @@ void CTierazonView::OnDraw4()
 	CIMID = 0;
 
   ActiveTitle = "4.) ";
+	SaveForUndo();
 	nDistortion = 4;
 
   GoDoFractal();
@@ -646,6 +708,7 @@ void CTierazonView::OnDraw5()
 	CIMID = 0;
 
   ActiveTitle = "5.) ";
+	SaveForUndo();
 	nDistortion = 5;
 
   GoDoFractal();
@@ -664,6 +727,7 @@ void CTierazonView::OnDraw6()
 	CIMID = 0;
 
   ActiveTitle = "6.) ";
+	SaveForUndo();
 	nDistortion = 6;
 
   GoDoFractal();
@@ -682,6 +746,7 @@ void CTierazonView::OnDraw7()
 	CIMID = 0;
 
   ActiveTitle = "7.) ";
+	SaveForUndo();
 	nDistortion = 7;
 
   GoDoFractal();
@@ -700,6 +765,7 @@ void CTierazonView::OnDraw8()
 	CIMID = 0;
 
   ActiveTitle = "8.) ";
+	SaveForUndo();
 	nDistortion = 8;
 
   GoDoFractal();
@@ -718,6 +784,7 @@ void CTierazonView::OnDraw9()
 	CIMID = 0;
 
   ActiveTitle = "9.) ";
+	SaveForUndo();
 	nDistortion = 9;
 
   GoDoFractal();
@@ -736,6 +803,7 @@ void CTierazonView::OnDraw10()
 	CIMID = 0;
 
   ActiveTitle = "10.) ";
+	SaveForUndo();
 	nDistortion = 10;
 
   GoDoFractal();
@@ -754,6 +822,7 @@ void CTierazonView::OnDraw11()
 	CIMID = 0;
 
   ActiveTitle = "11.) ";
+	SaveForUndo();
 	nDistortion = 11;
 
   GoDoFractal();
@@ -772,6 +841,7 @@ void CTierazonView::OnDraw12()
 	CIMID = 0;
 
   ActiveTitle = "12.) ";
+	SaveForUndo();
 	nDistortion = 12;
 
   GoDoFractal();
@@ -790,6 +860,7 @@ void CTierazonView::OnDraw13()
 	CIMID = 0;
 
   ActiveTitle = "13.) ";
+	SaveForUndo();
 	nDistortion = 13;
 
   GoDoFractal();
@@ -808,6 +879,7 @@ void CTierazonView::OnDraw14()
 	CIMID = 0;
 
   ActiveTitle = "14.) ";
+	SaveForUndo();
 	nDistortion = 14;
 
   GoDoFractal();
@@ -826,6 +898,7 @@ void CTierazonView::OnDraw15()
 	CIMID = 0;
 
   ActiveTitle = "15.) ";
+	SaveForUndo();
 	nDistortion = 15;
 
   GoDoFractal();
@@ -844,6 +917,7 @@ void CTierazonView::OnDraw16()
 	CIMID = 0;
 
   ActiveTitle = "16.) ";
+	SaveForUndo();
 	nDistortion = 16;
 
   GoDoFractal();
@@ -862,6 +936,7 @@ void CTierazonView::OnDraw17()
 	CIMID = 0;
 
   ActiveTitle = "17.) ";
+	SaveForUndo();
 	nDistortion = 17;
 
   GoDoFractal();
@@ -880,6 +955,7 @@ void CTierazonView::OnDraw18()
 	CIMID = 0;
 
   ActiveTitle = "18.) ";
+	SaveForUndo();
 	nDistortion = 18;
 
   GoDoFractal();
@@ -898,6 +974,7 @@ void CTierazonView::OnDraw19()
 	CIMID = 0;
 
   ActiveTitle = "19.) ";
+	SaveForUndo();
 	nDistortion = 19;
 
   GoDoFractal();
@@ -916,6 +993,7 @@ void CTierazonView::OnDraw20()
 	CIMID = 0;
 
   ActiveTitle = "20.) ";
+	SaveForUndo();
 	nDistortion = 20;
 
   GoDoFractal();
@@ -934,6 +1012,7 @@ void CTierazonView::OnDraw21()
 	CIMID = 0;
 
   ActiveTitle = "21.) ";
+	SaveForUndo();
 	nDistortion = 21;
 
   GoDoFractal();
@@ -952,6 +1031,7 @@ void CTierazonView::OnDraw22()
 	CIMID = 0;
 
   ActiveTitle = "22.) ";
+	SaveForUndo();
 	nDistortion = 22;
 
   GoDoFractal();
@@ -970,6 +1050,7 @@ void CTierazonView::OnDraw23()
 	CIMID = 0;
 
   ActiveTitle = "23.) ";
+	SaveForUndo();
 	nDistortion = 23;
 
   GoDoFractal();
@@ -988,6 +1069,7 @@ void CTierazonView::OnDraw24()
 	CIMID = 0;
 
   ActiveTitle = "24.) ";
+	SaveForUndo();
 	nDistortion = 24;
 
   GoDoFractal();
@@ -1006,6 +1088,7 @@ void CTierazonView::OnDraw25()
 	CIMID = 0;
 
   ActiveTitle = "25.) ";
+	SaveForUndo();
 	nDistortion = 25;
 
   GoDoFractal();
@@ -1024,6 +1107,7 @@ void CTierazonView::OnDraw26()
 	CIMID = 0;
 
   ActiveTitle = "26.) ";
+	SaveForUndo();
 	nDistortion = 26;
 
   GoDoFractal();
@@ -1042,6 +1126,7 @@ void CTierazonView::OnDraw27()
 	CIMID = 0;
 
   ActiveTitle = "27.) ";
+	SaveForUndo();
 	nDistortion = 27;
 
   GoDoFractal();
@@ -1060,6 +1145,7 @@ void CTierazonView::OnDraw28()
 	CIMID = 0;
 
   ActiveTitle = "28.) ";
+	SaveForUndo();
 	nDistortion = 28;
 
   GoDoFractal();
@@ -1078,6 +1164,7 @@ void CTierazonView::OnDraw29()
 	CIMID = 0;
 
   ActiveTitle = "29.) ";
+	SaveForUndo();
 	nDistortion = 29;
 
   GoDoFractal();
@@ -1096,6 +1183,7 @@ void CTierazonView::OnDraw30()
 	CIMID = 0;
 
   ActiveTitle = "30.) ";
+	SaveForUndo();
 	nDistortion = 30;
 
   GoDoFractal();
@@ -1114,6 +1202,7 @@ void CTierazonView::OnDraw31()
 	CIMID = 0;
 
   ActiveTitle = "31.) ";
+	SaveForUndo();
 	nDistortion = 31;
 
   GoDoFractal();
@@ -1132,6 +1221,7 @@ void CTierazonView::OnDraw32()
 	CIMID = 0;
 
   ActiveTitle = "32.) ";
+	SaveForUndo();
 	nDistortion = 32;
 
   GoDoFractal();
@@ -1150,6 +1240,7 @@ void CTierazonView::OnDraw33()
 	CIMID = 0;
 
   ActiveTitle = "33.) ";
+	SaveForUndo();
 	nDistortion = 33;
 
   GoDoFractal();
@@ -1168,6 +1259,7 @@ void CTierazonView::OnDraw34()
 	CIMID = 0;
 
   ActiveTitle = "34.) ";
+	SaveForUndo();
 	nDistortion = 34;
 
   GoDoFractal();
@@ -1186,6 +1278,7 @@ void CTierazonView::OnDraw35()
 	CIMID = 0;
 
   ActiveTitle = "35.) ";
+	SaveForUndo();
 	nDistortion = 35;
 
   GoDoFractal();
@@ -1205,6 +1298,7 @@ void CTierazonView::OnDraw36()
 	CIMID = 0;
 
   ActiveTitle = "36.) ";
+	SaveForUndo();
 	nDistortion = 36;
 
   GoDoFractal();
@@ -1223,6 +1317,7 @@ void CTierazonView::OnDraw37()
 	CIMID = 0;
 
   ActiveTitle = "37.) ";
+	SaveForUndo();
 	nDistortion = 37;
 
   GoDoFractal();
@@ -1241,6 +1336,7 @@ void CTierazonView::OnDraw38()
 	CIMID = 0;
 
   ActiveTitle = "38.) ";
+	SaveForUndo();
 	nDistortion = 38;
 
   GoDoFractal();
@@ -1259,6 +1355,7 @@ void CTierazonView::OnDraw39()
 	CIMID = 0;
 
   ActiveTitle = "39.) ";
+	SaveForUndo();
 	nDistortion = 39;
 
   GoDoFractal();
@@ -1277,6 +1374,7 @@ void CTierazonView::OnDraw40()
 	CIMID = 0;
 
   ActiveTitle = "40.) ";
+	SaveForUndo();
 	nDistortion = 40;
 
   GoDoFractal();
@@ -1295,6 +1393,7 @@ void CTierazonView::OnDraw41()
 	CIMID = 0;
 
   ActiveTitle = "41.) ";
+	SaveForUndo();
 	nDistortion = 41;
 
   GoDoFractal();
@@ -1313,6 +1412,7 @@ void CTierazonView::OnDraw42()
 	CIMID = 0;
 
   ActiveTitle = "42.) ";
+	SaveForUndo();
 	nDistortion = 42;
 
   GoDoFractal();
@@ -1331,6 +1431,7 @@ void CTierazonView::OnDraw43()
 	CIMID = 0;
 
   ActiveTitle = "43.) ";
+	SaveForUndo();
 	nDistortion = 43;
 
   GoDoFractal();
@@ -1349,6 +1450,7 @@ void CTierazonView::OnDraw44()
 	CIMID = 0;
 
   ActiveTitle = "44.) ";
+	SaveForUndo();
 	nDistortion = 44;
 
   GoDoFractal();
@@ -1367,6 +1469,7 @@ void CTierazonView::OnDraw45()
 	CIMID = 0;
 
   ActiveTitle = "45.) ";
+	SaveForUndo();
 	nDistortion = 45;
 
   GoDoFractal();
@@ -1385,6 +1488,7 @@ void CTierazonView::OnDraw46()
 	CIMID = 0;
 
   ActiveTitle = "46.) ";
+	SaveForUndo();
 	nDistortion = 46;
 
   GoDoFractal();
@@ -1403,6 +1507,7 @@ void CTierazonView::OnDraw47()
 	CIMID = 0;
 
   ActiveTitle = "47.) ";
+	SaveForUndo();
 	nDistortion = 47;
 
   GoDoFractal();
@@ -1421,6 +1526,7 @@ void CTierazonView::OnDraw48()
 	CIMID = 0;
 
   ActiveTitle = "48.) ";
+	SaveForUndo();
 	nDistortion = 48;
 
   GoDoFractal();
@@ -1439,6 +1545,7 @@ void CTierazonView::OnDraw49()
 	CIMID = 0;
 
   ActiveTitle = "49.) ";
+	SaveForUndo();
 	nDistortion = 49;
 
   GoDoFractal();
@@ -1457,6 +1564,7 @@ void CTierazonView::OnDraw50()
 	CIMID = 0;
 
   ActiveTitle = "50.) ";
+	SaveForUndo();
 	nDistortion = 50;
 
   GoDoFractal();
@@ -1475,6 +1583,7 @@ void CTierazonView::OnDraw51()
 	CIMID = 0;
 
   ActiveTitle = "51.) ";
+	SaveForUndo();
 	nDistortion = 51;
 
   GoDoFractal();
@@ -1493,6 +1602,7 @@ void CTierazonView::OnDraw52()
 	CIMID = 0;
 
   ActiveTitle = "52.) ";
+	SaveForUndo();
 	nDistortion = 52;
 
   GoDoFractal();
@@ -1511,6 +1621,7 @@ void CTierazonView::OnDraw53()
 	CIMID = 0;
 
   ActiveTitle = "53.) ";
+	SaveForUndo();
 	nDistortion = 53;
 
   GoDoFractal();
@@ -1529,6 +1640,7 @@ void CTierazonView::OnDraw54()
 	CIMID = 0;
 
   ActiveTitle = "54.) ";
+	SaveForUndo();
 	nDistortion = 54;
 
   GoDoFractal();
@@ -1547,6 +1659,7 @@ void CTierazonView::OnDraw55()
 	CIMID = 0;
 
   ActiveTitle = "55.) ";
+	SaveForUndo();
 	nDistortion = 55;
 
   GoDoFractal();
@@ -1565,6 +1678,7 @@ void CTierazonView::OnDraw56()
 	CIMID = 0;
 
   ActiveTitle = "56.) ";
+	SaveForUndo();
 	nDistortion = 56;
 
   GoDoFractal();
@@ -1583,6 +1697,7 @@ void CTierazonView::OnDraw57()
 	CIMID = 0;
 
   ActiveTitle = "57.) ";
+	SaveForUndo();
 	nDistortion = 57;
 
   GoDoFractal();
@@ -1601,6 +1716,7 @@ void CTierazonView::OnDraw58()
 	CIMID = 0;
 
   ActiveTitle = "58.) ";
+	SaveForUndo();
 	nDistortion = 58;
 
   GoDoFractal();
@@ -1619,6 +1735,7 @@ void CTierazonView::OnDraw59()
 	CIMID = 0;
 
   ActiveTitle = "59.) ";
+	SaveForUndo();
 	nDistortion = 59;
 
   GoDoFractal();
@@ -1637,6 +1754,7 @@ void CTierazonView::OnDraw60()
 	CIMID = 0;
 
   ActiveTitle = "60.) ";
+	SaveForUndo();
 	nDistortion = 60;
 
   GoDoFractal();
@@ -1655,6 +1773,7 @@ void CTierazonView::OnDraw61()
 	CIMID = 0;
 
   ActiveTitle = "61.) ";
+	SaveForUndo();
 	nDistortion = 61;
 
   GoDoFractal();
@@ -1673,6 +1792,7 @@ void CTierazonView::OnDraw62()
 	CIMID = 0;
 
   ActiveTitle = "62.) ";
+	SaveForUndo();
 	nDistortion = 62;
 
   GoDoFractal();
@@ -1684,7 +1804,6 @@ void CTierazonView::OnUpdateDraw62(CCmdUI* pCmdUI)
 	else  pCmdUI->SetCheck(FALSE);
 }
 
-
 void CTierazonView::OnDraw63() 
 {
 	dMagnification = 1;
@@ -1692,6 +1811,7 @@ void CTierazonView::OnDraw63()
 	CIMID = 0;
 
   ActiveTitle = "63.) ";
+	SaveForUndo();
 	nDistortion = 63;
 
   GoDoFractal();
@@ -1710,6 +1830,7 @@ void CTierazonView::OnDraw64()
 	CIMID = 0;
 
   ActiveTitle = "64.) ";
+	SaveForUndo();
 	nDistortion = 64;
 
   GoDoFractal();
@@ -1728,6 +1849,7 @@ void CTierazonView::OnDraw65()
 	CIMID = 0;
 
   ActiveTitle = "65.) ";
+	SaveForUndo();
 	nDistortion = 65;
 
   GoDoFractal();
@@ -1746,6 +1868,7 @@ void CTierazonView::OnDraw66()
 	CIMID = 0;
 
   ActiveTitle = "66.) ";
+	SaveForUndo();
 	nDistortion = 66;
 
   GoDoFractal();
@@ -1764,6 +1887,7 @@ void CTierazonView::OnDraw67()
 	CIMID = 0;
 
   ActiveTitle = "67.) ";
+	SaveForUndo();
 	nDistortion = 67;
 
   GoDoFractal();
@@ -1782,6 +1906,7 @@ void CTierazonView::OnDraw68()
 	CIMID = 0;
 
   ActiveTitle = "68.) ";
+	SaveForUndo();
 	nDistortion = 68;
 
   GoDoFractal();
@@ -1800,6 +1925,7 @@ void CTierazonView::OnDraw69()
 	CIMID = 0;
 
   ActiveTitle = "69.) ";
+	SaveForUndo();
 	nDistortion = 69;
 
   GoDoFractal();
@@ -1818,6 +1944,7 @@ void CTierazonView::OnDraw70()
 	CIMID = 0;
 
   ActiveTitle = "70.) ";
+	SaveForUndo();
 	nDistortion = 70;
 
   GoDoFractal();
@@ -1836,6 +1963,7 @@ void CTierazonView::OnDraw71()
 	CIMID = 0;
 
   ActiveTitle = "71.) ";
+	SaveForUndo();
 	nDistortion = 71;
 
   GoDoFractal();
@@ -1854,6 +1982,7 @@ void CTierazonView::OnDraw72()
 	CIMID = 0;
 
   ActiveTitle = "72.) ";
+	SaveForUndo();
 	nDistortion = 72;
 
   GoDoFractal();
@@ -1872,6 +2001,7 @@ void CTierazonView::OnDraw73()
 	CIMID = 0;
 
   ActiveTitle = "73.) ";
+	SaveForUndo();
 	nDistortion = 73;
 
   GoDoFractal();
@@ -1890,6 +2020,7 @@ void CTierazonView::OnDraw74()
 	CIMID = 0;
 
   ActiveTitle = "74.) ";
+	SaveForUndo();
 	nDistortion = 74;
 
   GoDoFractal();
@@ -1908,6 +2039,7 @@ void CTierazonView::OnDraw75()
 	CIMID = 0;
 
   ActiveTitle = "75.) ";
+	SaveForUndo();
 	nDistortion = 75;
 
   GoDoFractal();
@@ -1926,6 +2058,7 @@ void CTierazonView::OnDraw76()
 	CIMID = 0;
 
   ActiveTitle = "76.) ";
+	SaveForUndo();
 	nDistortion = 76;
 
   GoDoFractal();
@@ -1944,6 +2077,7 @@ void CTierazonView::OnDraw77()
 	CIMID = 0;
 
   ActiveTitle = "77.) ";
+	SaveForUndo();
 	nDistortion = 77;
 
   GoDoFractal();
@@ -1962,6 +2096,7 @@ void CTierazonView::OnDraw78()
 	CIMID = 0;
 
   ActiveTitle = "78.) ";
+	SaveForUndo();
 	nDistortion = 78;
 
   GoDoFractal();
@@ -1980,6 +2115,7 @@ void CTierazonView::OnDraw79()
 	CIMID = 0;
 
   ActiveTitle = "79.) ";
+	SaveForUndo();
 	nDistortion = 79;
 
   GoDoFractal();
@@ -1998,6 +2134,7 @@ void CTierazonView::OnDraw80()
 	CIMID = 0;
 
   ActiveTitle = "80.) ";
+	SaveForUndo();
 	nDistortion = 80;
 
   GoDoFractal();
@@ -2016,6 +2153,7 @@ void CTierazonView::OnDraw81()
 	CIMID = 0;
 
   ActiveTitle = "81.) ";
+	SaveForUndo();
 	nDistortion = 81;
 
   GoDoFractal();
@@ -2034,6 +2172,7 @@ void CTierazonView::OnDraw82()
 	CIMID = 0;
 
   ActiveTitle = "82.) ";
+	SaveForUndo();
 	nDistortion = 82;
 
   GoDoFractal();
@@ -2052,6 +2191,7 @@ void CTierazonView::OnDraw83()
 	CIMID = 0;
 
   ActiveTitle = "83.) ";
+	SaveForUndo();
 	nDistortion = 83;
 
   GoDoFractal();
@@ -2070,6 +2210,7 @@ void CTierazonView::OnDraw84()
 	CIMID = 0;
 
   ActiveTitle = "84.) ";
+	SaveForUndo();
 	nDistortion = 84;
 
   GoDoFractal();
@@ -2088,6 +2229,7 @@ void CTierazonView::OnDraw85()
 	CIMID = 0;
 
   ActiveTitle = "85.) ";
+	SaveForUndo();
 	nDistortion = 85;
 
   GoDoFractal();
@@ -2106,6 +2248,7 @@ void CTierazonView::OnDraw86()
 	CIMID = 0;
 
   ActiveTitle = "86.) ";
+	SaveForUndo();
 	nDistortion = 86;
 
   GoDoFractal();
@@ -2124,6 +2267,7 @@ void CTierazonView::OnDraw87()
 	CIMID = 0;
 
   ActiveTitle = "87.) ";
+	SaveForUndo();
 	nDistortion = 87;
 
   GoDoFractal();
@@ -2142,6 +2286,7 @@ void CTierazonView::OnDraw88()
 	CIMID = 0;
 
   ActiveTitle = "88.) ";
+	SaveForUndo();
 	nDistortion = 88;
 
   GoDoFractal();
@@ -2160,6 +2305,7 @@ void CTierazonView::OnDraw89()
 	CIMID = 0;
 
   ActiveTitle = "89.) ";
+	SaveForUndo();
 	nDistortion = 89;
 
   GoDoFractal();
@@ -2178,6 +2324,7 @@ void CTierazonView::OnDraw90()
 	CIMID = 0;
 
   ActiveTitle = "90.) ";
+	SaveForUndo();
 	nDistortion = 90;
 
   GoDoFractal();
@@ -2196,6 +2343,7 @@ void CTierazonView::OnDraw91()
 	CIMID = 0;
 
   ActiveTitle = "91.) ";
+	SaveForUndo();
 	nDistortion = 91;
 
   GoDoFractal();
@@ -2214,6 +2362,7 @@ void CTierazonView::OnDraw92()
 	CIMID = 0;
 
   ActiveTitle = "92.) ";
+	SaveForUndo();
 	nDistortion = 92;
 
   GoDoFractal();
@@ -2232,6 +2381,7 @@ void CTierazonView::OnDraw93()
 	CIMID = 0;
 
   ActiveTitle = "93.) ";
+	SaveForUndo();
 	nDistortion = 93;
 
   GoDoFractal();
@@ -2250,6 +2400,7 @@ void CTierazonView::OnDraw94()
 	CIMID = 0;
 
   ActiveTitle = "94.) ";
+	SaveForUndo();
 	nDistortion = 94;
 
   GoDoFractal();
@@ -2268,6 +2419,7 @@ void CTierazonView::OnDraw95()
 	CIMID = 0;
 
   ActiveTitle = "95.) ";
+	SaveForUndo();
 	nDistortion = 95;
 
   GoDoFractal();
@@ -2286,6 +2438,7 @@ void CTierazonView::OnDraw96()
 	CIMID = 0;
 
   ActiveTitle = "96.) ";
+	SaveForUndo();
 	nDistortion = 96;
 
   GoDoFractal();
@@ -2304,6 +2457,7 @@ void CTierazonView::OnDraw97()
 	CIMID = 0;
 
   ActiveTitle = "97.) ";
+	SaveForUndo();
 	nDistortion = 97;
 
   GoDoFractal();
@@ -2322,6 +2476,7 @@ void CTierazonView::OnDraw98()
 	CIMID = 0;
 
   ActiveTitle = "98.) ";
+	SaveForUndo();
 	nDistortion = 98;
 
   GoDoFractal();
@@ -2340,6 +2495,7 @@ void CTierazonView::OnDraw99()
 	CIMID = 0;
 
   ActiveTitle = "99.) ";
+	SaveForUndo();
 	nDistortion = 99;
 
   GoDoFractal();
@@ -2358,6 +2514,7 @@ void CTierazonView::OnDraw100()
 	CIMID = 0;
 
   ActiveTitle = "100.) ";
+	SaveForUndo();
 	nDistortion = 100;
 
   GoDoFractal();
@@ -2369,6 +2526,310 @@ void CTierazonView::OnUpdateDraw100(CCmdUI* pCmdUI)
 	else  pCmdUI->SetCheck(FALSE);
 }
 
+void CTierazonView::OnDraw102() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "102.) magnet1 ";
+	SaveForUndo();
+	nDistortion = 102;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw102(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 102) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw103() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "103.) magnet2 ";
+	SaveForUndo();
+	nDistortion = 103;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw103(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 103) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw104() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "104.) teddy bear ";
+	SaveForUndo();
+	nDistortion = 104;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw104(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 104) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw105() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "105.) ";
+	SaveForUndo();
+	nDistortion = 105;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw105(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 105) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw106() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "106.) ";
+	SaveForUndo();
+	nDistortion = 106;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw106(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 106) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw107() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "107.) ";
+	SaveForUndo();
+	nDistortion = 107;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw107(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 107) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw108() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "108.) ";
+	SaveForUndo();
+	nDistortion = 108;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw108(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 108) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw109() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "109.) ";
+	SaveForUndo();
+	nDistortion = 109;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw109(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 109) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw110() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "110.) ";
+	SaveForUndo();
+	nDistortion = 110;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw110(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 110) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw111() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "111.) ";
+	SaveForUndo();
+	nDistortion = 111;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw111(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 111) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw112() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "112.) ";
+	SaveForUndo();
+	nDistortion = 112;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw112(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 112) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw113() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "113.) ";
+	SaveForUndo();
+	nDistortion = 113;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw113(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 113) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw114() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "114.) ";
+	SaveForUndo();
+	nDistortion = 114;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw114(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 114) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw115() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "115.) ";
+	SaveForUndo();
+	nDistortion = 115;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw115(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 115) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw116() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "116.) ";
+	SaveForUndo();
+	nDistortion = 116;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw116(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 116) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnDraw117() 
+{
+	dMagnification = 1;
+	CRMID = 0;
+	CIMID = 0;
+
+  ActiveTitle = "117.) ";
+	SaveForUndo();
+	nDistortion = 117;
+
+  GoDoFractal();
+}
+
+void CTierazonView::OnUpdateDraw117(CCmdUI* pCmdUI) 
+{
+	if (nDistortion == 117) pCmdUI->SetCheck(TRUE);	
+	else  pCmdUI->SetCheck(FALSE);
+}
+
 ///////////////////////////////////////////////////
 
 void CTierazonView::OnDimensionVariant() 
@@ -2376,6 +2837,7 @@ void CTierazonView::OnDimensionVariant()
 	bDimensionVariant ^= 1;
 	bDraw = TRUE;
 	bLaunch = FALSE;
+	bInitialized = FALSE;
 }
 
 void CTierazonView::OnUpdateDimensionVariant(CCmdUI* pCmdUI) 
@@ -2393,6 +2855,7 @@ void CTierazonView::OnDrawInsideout()
 	//GoDoFractal();
 	bDraw = TRUE;
 	bLaunch = FALSE;
+	bInitialized = FALSE;
 }
 
 void CTierazonView::OnUpdateDrawInsideout(CCmdUI* pCmdUI) 

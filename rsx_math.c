@@ -17,16 +17,27 @@
 
 void Formula_01()
 {
+	/*
+  while ( n_color++ < maxit && ( mx = __real__ z * __real__ z ) + ( my = __imag__ z * __imag__ z ) < bailout )
+  {
+      zz = __real__ z * __imag__ z;
+      __imag__ z = zz + zz + __imag__ c;
+      __real__ z = mx - my + __real__ c;
+      if (filter) Do_Filter();
+  }
+	*/
+
+ 	//while( n_color++ < maxit
+    //&& sum_sqrs_z() < bailout)
+
+	zd = 1;
   while( n_color++ < maxit
-    && sum_sqrs_z() < bailout)
-	//d = 1;
-  //while( n_color++ < maxit
-    //&& d > minsize)
+    && sum_sqrs_zd() > minsize)
 		//&& d < bailout)
   {
-		//z1 = z;
+		z1 = z;
     z=z*z+c;
-    //z3 = z-z1;
+    zd = z-z1;
 		//d = sum_sqrs_z3();
     if (filter) Do_Filter();
   }
@@ -38,16 +49,14 @@ void Formula_02()  // Newton-Julia-Nova
   if (jul == 0)	
 		z = 1;
 
-  d = 1;
-
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z=z-((z*z1-1)/(3*z1))+c;
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -90,15 +99,14 @@ void Formula_04()  // Talis
 
 void Formula_05()  // 
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
 		z=((z*z1-z-1)/(3*z1-1)-z)*c;  //
-    z3 = z-z2;
-		d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -107,15 +115,14 @@ void Formula_06()  //
 {  
 	if (jul == 0)
 	  z = 0;
-	d = 1;
+	zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
 		z1=z*z;
 		z = z-((z*z1)+(c-1)*z-c)/(3*(z1)+c-1);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -124,17 +131,16 @@ void Formula_07()
 {
 	if (jul == 0)
 		z=0;
-  d=1;
+  zd=1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
 		//z = z-((z*z*z)+(c-1)*z-c)/(3*(z*z)+c-1);					
 		//z=z+c;
 		z = (z-((z*z*z+c*z-z-c)/(3*z*z+c-1)))+c;					
 		//z=z+c;
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -143,15 +149,14 @@ void Formula_08()
 {
 	if (jul == 0)
 		z = 1;
-	d = 1;
+	zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1=z*z*z;
     z=z-(z*z1-z)/(4*z1-1)+c;				
     z3 = z-z2;
-    d = sum_sqrs_z3();
     if (filter) Do_Filter();
   }
 }
@@ -160,15 +165,14 @@ void Formula_09()
 {
 	if (jul == 0)
   	z = 1;
-	d = 1;
+	zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1=z*z*z;
     z=z-(z*z1-z)/(4*z1-z)+c;
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -394,16 +398,15 @@ WWW Fractal Galleries   http://sprott.physics.wisc.edu/carlson.htm
 */
 
   z = -z/3;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z=z-(z*z1+z1*c-z+c)/(3*z1+2*c*z-1);
     //z=z1*z1+c;
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -411,16 +414,13 @@ WWW Fractal Galleries   http://sprott.physics.wisc.edu/carlson.htm
 void Formula_19()
 {
   z = -z/3;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
-
     z=z-(z*z*z+c*z*z+z+c)/(3*z*z+2*c*z+1);
-
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -444,15 +444,14 @@ void Formula_20()
   */
 
   z = z/2;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z=z-(z1*z1 - z1*z*c - z - c)/(4*z*z1 - 3*z1*c - 1);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -476,15 +475,14 @@ void Formula_21()  // testing
   */
 
   z = -1/(3*z);
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z =z-(z*z1*c + z1 + z + c)/(3*z1*c + 2*z + 1);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -518,16 +516,15 @@ void Formula_22()  // testing
   if (jul == 0)
     z = -.5;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z  = z2;
     z =z-(z1*z1*c + z1*z*c + z + c)/(4*z1*z*c + 3*z1*c + 1);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -553,15 +550,14 @@ void Formula_23()  // testing
   */
 
   z = -.5/z;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z =z-(z1*z1*c + z1*z + z + c)/(4*z1*z*c + 3*z1 + 1);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -585,15 +581,14 @@ void Formula_24()  // testing
 
   z = -z/3;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z =z-(z1*z + z1*c + c)/(3*z1 + 2*z*c);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -617,15 +612,14 @@ void Formula_25()  // testing
   */
 
   z = -z/2;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z2 = z;
     z1 = z*z;
     z =z-(z1*z1 + z1*z*c + c)/(4*z1*z + 3*z*z*c);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    zd = z-z2;
     if (filter) Do_Filter();
   }
 }
@@ -654,17 +648,19 @@ void Formula_26()  // testing
 
   z = -(3*z)/5;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
-    z2 = z;
-    z1 = z*z;
-    z4 = z1*z1;
-    z =z-(z4*z + z4*c + c)/(5*z4 + 4*z1*z*c);
-    z3 = z-z2;
-    d = sum_sqrs_z3();
+    z1 = z;
+    z2 = z*z;
+    z4 = z2*z2;			
+		z = (5*z4 + 4*z2*z1*c);
     if (filter) Do_Filter();
+		z  = z1-(z4*z1 + z4*c + c)/z;
+    zd = z - z1;
+
+    //d = sum_sqrs_zd();
   }
 }
 
@@ -691,17 +687,18 @@ void Formula_27()  // testing
 
   z = -(5*z)/7;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
-    z2 = z*z;
-    z5 = z2*z2*z;
-    z =z-(z5*z2 + z5*z*c + c)/(7*z5*z + 6*z5*c);
-    z3 = z-z1;
-    d = sum_sqrs_z3();
+    z2 = z1*z1;
+    z5 = z2*z2*z1;
+		z  = (7*z5*z1 + 6*z5*c);
     if (filter) Do_Filter();
+    z  = z1-(z5*z2 + z5*z1*c + c)/z;
+    zd = z-z1;
+    //d  = sum_sqrs_z3();
   }
 }
 
@@ -727,9 +724,9 @@ void Formula_28()  // 9th order Newton Mset
 
   z = -(7*z)/9;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -737,8 +734,7 @@ void Formula_28()  // 9th order Newton Mset
     z5 = z2*z2*z;
     z8 = z4*z4;
     z =z-(z5*z4 + z8*c + c)/(9*z8 + 8*z5*z2*c);
-    z3 = z-z1;
-    d = sum_sqrs_z3();
+    zd = z-z1;
     if (filter) Do_Filter();
   }
 }
@@ -766,9 +762,9 @@ void Formula_29()  // 13th order Newton Mset
 
   z = -(11*z)/13;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -776,8 +772,7 @@ void Formula_29()  // 13th order Newton Mset
     z5 = z2*z2*z;
     z8 = z4*z4;
     z =z-(z8*z4*z + z8*z4*c + c)/(13*z8*z4 + 12*z8*z2*z*c);
-    z3 = z-z1;
-    d = sum_sqrs_z3();
+    zd = z-z1;
     if (filter) Do_Filter();
   }
 }
@@ -807,9 +802,9 @@ void Formula_30()  // Testing again
   z = -(z*7)/9;
 
   //z=0;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -817,7 +812,6 @@ void Formula_30()  // Testing again
     z4 = z2*z2;
     z =z-(z4*z4*z + z4*z4*c + c)/(9*z4*z4 + 8*z4*z3*c);
     zd = z-z1;
-    d  = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -841,15 +835,14 @@ void Formula_31()  // Newton Diamond
   */
 
   z = -(3*z)/5;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z=z-(z2*z2*z + z2*z2*c + z + c)/(5*z2*z2 + 4*z2*z*c + 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -872,16 +865,15 @@ void Formula_32()  // Newton Pentagon
   */
 
   z = -(2*z)/3;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z4 = z2*z2;
     z=z-(z4*z2 + z4*z*c + z + c)/(6*z4*z + 5*z4*c + 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -905,16 +897,15 @@ void Formula_33()  // Newton Hexagon
   */
 
   z = -(5*z)/7;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z4 = z2*z2;
     z=z-(z4*z2*z + z4*z2*c + z + c)/(7*z4*z2 + 6*z4*z*c + 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -939,16 +930,15 @@ void Formula_34()  // Newton Octagon
   */
 
   z = -(7*z)/9;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z4 = z2*z2;
     z=z-(z4*z4*z + z4*z4*c + z + c)/(9*z4*z4 + 8*z4*z2*z*c + 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -973,9 +963,9 @@ void Formula_35()  // Testing
   */
 
   z = -11*z/13;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -984,7 +974,6 @@ void Formula_35()  // Testing
     z12= z8*z4;
     z  = z-(z12*z + z12*c - z)/(13*z12 + 12*z4*z4*z2*z*c - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -993,152 +982,142 @@ void Formula_35()  // Testing
 
 void Formula_36()  // 70
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z3 = z*z*z;
 		z=z-(z3*z*c-z+c)/(4*z3*c);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_37()  // 71
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2-z+c)/(3*z2);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_38()  // 72
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-z*c-1)/(3*z2*c);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_39()  // 73
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-z*z*c-1)/(3*z2*c);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_40()  // 74
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-1)/(3*z2*c);
 		z=z*z*c+c;
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_41()  // 75
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-z-1)/(3*z2*c-z);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_42()  // 76
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-z*c-1)/(3*z2*c-z);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_43()  // 77
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-z2-1)/(3*z2*c-3*z2-3*z);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_44()  // 78
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;	
 		z2 = z*z;
 		z=z-(z*z2*c-z2*c-1)/(3*z2*c-z*c-z);
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
 
 void Formula_45()  // 105
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
 	{
 		z1 = z;
 		z2=z*z;
 		z=(z-(z*z2-z)/(3*z2-1));
 		z=z*z*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
 		if (filter) Do_Filter();
 	}
 }
@@ -1276,18 +1255,15 @@ void Formula_52()  // More Testing with the Newton Flower
   */
 
   z = -(3*z)/4;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z4 = z2*z2;
-    //z8 = z4*z4;
-    //z12= z8*z4;
     z  = z-(z4*z4 + z4*z2*z1*c - z)/(8*z4*z2*z1 + 7*z4*z2*c - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1312,19 +1288,15 @@ void Formula_53()  // More Testing with the Newton Flower
   */
 
 	z				 = -(2*z)/3;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
 		z1 = z;
     z2 = z*z;
     z4 = z2*z2;
-    //z8 = z4*z4;
-    //z12= z8*z4;
     z = z-(z4*z2 + z4*z*c - 1)/(6*z4*z + 5*z2*z2*c);
     zd = z-z1;
-
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1350,9 +1322,9 @@ void Formula_54()  // More Testing with the Newton Flower
   */
 
   z = -(13*z)/15;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -1361,7 +1333,6 @@ void Formula_54()  // More Testing with the Newton Flower
     z12= z8*z4;
     z  = z-(z12*z2*z + z12*z2*c - z)/(15*z12*z2 + 14*z12*z*c - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1387,18 +1358,15 @@ void Formula_55()  // A derivation of Newtons apple
   */
 
   z = 1/(4*z);
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z4 = z2*z2;
-    //z8 = z4*z4;
-    //z12= z8*z4;
     z  = z-(4*z2*z*c - 3*z2 - 2*z)/(12*z2*c - 6*z - 2);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1406,7 +1374,6 @@ void Formula_55()  // A derivation of Newtons apple
 void Formula_56()  // More Testing with the Newton Flower
 {
   /*
-
   Solve the roots of the function.
   Initialize z to one of the roots.
   Apply Newton's method for solving roots.
@@ -1424,9 +1391,9 @@ void Formula_56()  // More Testing with the Newton Flower
   */
 
   z = -(23*z)/25;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -1436,7 +1403,6 @@ void Formula_56()  // More Testing with the Newton Flower
 		z24 = z12*z12;
     z  = z-(z24*z + z24*c - z)/(25*z24 + 24*z12*z8*z2*z*c - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1444,7 +1410,6 @@ void Formula_56()  // More Testing with the Newton Flower
 void Formula_57()  // More Testing with the Newton Flower
 {
   /*
-
   Solve the roots of the function.
   Initialize z to one of the roots.
   Apply Newton's method for solving roots.
@@ -1462,9 +1427,9 @@ void Formula_57()  // More Testing with the Newton Flower
   */
 
   z = -(18*z)/19;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -1475,7 +1440,6 @@ void Formula_57()  // More Testing with the Newton Flower
 		z36 = z24*z12;
     z  = z-(z36*z2 + z36*z*c - z)/(38*z36*z + 37*z36*c - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1501,9 +1465,9 @@ void Formula_58()  // More Testing with the Newton Flower
   */
 
   z = -(24*z)/25;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
@@ -1515,7 +1479,6 @@ void Formula_58()  // More Testing with the Newton Flower
 		z48 = z24*z24;
     z  = z-(z48*z2 + z48*z*c - z)/(50*z48*z + 49*z48*c - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1540,18 +1503,15 @@ void Formula_59()  // A derivation of Newtons apple
   */
 
   z = -1/(2*z);
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z2 = z*z;
     z4 = z2*z2;
-    //z8 = z4*z4;
-    //z12= z8*z4;
     z  = z-(6*z4*z*c + 5*z4 - 1)/(30*z4*c + 20*z2*z);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1575,19 +1535,17 @@ void Formula_60()  // A derivation of Newtons apple
   */
 
   z = -4896/(5814*z);
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1  = z;
     z2  = z*z;
     z4  = z2*z2;
     z8  = z4*z4;
-    //z12 = z8*z4;
 		z16 = z8*z8; 
     z  = z-(19*z16*z2*c + 18*z16*z - z)/(342*z16*z*c + 306*z16 - 1);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1598,9 +1556,9 @@ void Formula_61()
 {
 	if (jul == 0)
 		z = 0;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1  = z;
     z=z*z+c;
@@ -1608,261 +1566,245 @@ void Formula_61()
 		__real__ z = __imag__ z;
 		__imag__ z = temp;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_62()  // Flarium 94
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
     z=((z*z2-z-1)/(z2*z-1)-z)*c;   // 3rd order M-Set
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_63()		// Flarium 95
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
 		z=((z2*z2-z2-1)/(4*z2-1)-z)*c;  // 
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_64()		// Flarium 96
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
     z=(z-(z*z2-1)/(3*z2-fabs(z)-1))*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_65()   // Flarium 97
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
 		z=(z-(z*z2-1)/(3*z2-z-1))*c;  // Almost makes a connection
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_66()  // Flarium 98
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
     z=((z*z3-z-1)/(4*z3-z-1)-z)*c;  // Some strange curls
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_67()  // Inkblot 2
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
 		z=z-((z*z2-z)/((3*z2-1)))+c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_68()		// // Flarium 100
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
     z=(z-(z*z2-1)/(4*z2-z-1))*c;  
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_69()  // Flarium 101
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
  		z=(z-(z*z2-1)/(3*z2-z))*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_70()  // Flarium 102
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
 		z=(z-(z*z3-1)/(4*z3-z))*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_71()  // Flarium 103
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
 		z=(z-(z*z3-1)/(3*z3-z))*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_72()  // Flarium 104
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
 		z=(z-(z*z3-z-1)/(3*z3-z))*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_73()  // Flarium 105
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
-    z=c*(z-(z*z*z-z)/(3*z*z-1));  // 105
+		z2 = z*z;
+    z=(z-(z*z2-z)/(3*z2-1));  // 105
+		z=z*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_74()  // Flarium 106
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
     z=((1-z-z3*z)/(z-(4*z3))-z)*c;  // sort of a good one
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_75()  // Flarium 107
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
 		z=((z-z3*z)/(z-(3*z3))-z)*c;  // 107
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_76()  // Flarium 108
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3 = z*z*z;
 		z=((z-z3)/(z-(3*z3))-z)*c;  // 108
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_77() // Flarium 109
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
 	  z=((z2*z-1)/(2*z2-1)-z)*c;  // 109
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_78()  // Flarium 110
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = z*z;
 		z=((z*z2-z-1)/(3*z*z2-1)-z)*c; // 2nd Order M-Set 110
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1880,14 +1822,13 @@ void Formula_79()  // CBAP  F(z) = Z^3 - 3*(A^2)*Z + B(MOD 2)
 	if (jul == 0)
 		z=-ca;
   
-	d = 1;
+	zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z = z*z*z-caa3*z+cb;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1895,17 +1836,14 @@ void Formula_79()  // CBAP  F(z) = Z^3 - 3*(A^2)*Z + B(MOD 2)
 void Formula_80()  // Flarium 22
 {
 	z2 = .5;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {		
-		z1 = z;
-		
+		z1 = z;		
 		z  = z*z-z2*z2+c;
 		z2 = z1;
-
 		zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1913,15 +1851,14 @@ void Formula_80()  // Flarium 22
 void Formula_81()  // Flarium 23
 {
 	z2 = z;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z=z*z*z*z+z2+c;
 		z2=z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1929,15 +1866,14 @@ void Formula_81()  // Flarium 23
 void Formula_82()  // Flarium 24
 {
 	z2 = z;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z=z*z*z*z+5*z2*c;
 		z2=z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1945,15 +1881,14 @@ void Formula_82()  // Flarium 24
 void Formula_83()  // Flarium 87
 {
 	t = 0;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z=z*z*z-t*t*t+c;
 		t=z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1961,15 +1896,14 @@ void Formula_83()  // Flarium 87
 void Formula_84()  // Flarium 88
 {
 	t = 0;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z=z*z*z*z-t*t*t*t+c;
 		t=z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -1997,64 +1931,60 @@ void Formula_85()		// Flarium 142, quartet
 void Formula_86()  // Flarium 65
 {
 	z = 1/z;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3=z*z*z;
 		z=z-(z*z3-z)/(4*z3-1);
 		z=z*z*c;
 		zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_87()  // Flarium 67
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2=z*z;
 		z=z-(z*z2-1)/(3*z2);
 		z=z*z*z*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_88()  // Flarium 68
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z3=z*z*z;
 		z=z-(z*z3-1)/(4*z3);
 		z=z*z*z*z*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_89()  // Flarium 69
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z4=z*z*z*z;
 		z=z-(z*z4-1)/(5*z4);
 		z=z*z*z*z*z*c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2097,14 +2027,13 @@ void Formula_91()  // Iterations 108 CCAP
 	if (jul == 0)
 		z=-ca;
 
-	d = 1;
+	zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z = z*z*z-caa3*z+cb;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2120,14 +2049,13 @@ void Formula_92()  // Iterations 109 CFAP
 	if (jul == 0)
 		z=-ca;
   
-	d = 1;
+	zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z = z*z*z-caa3*z+cb;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2135,29 +2063,27 @@ void Formula_92()  // Iterations 109 CFAP
 void Formula_93()  // Iterations 139
 {
 	z2 = z;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z=z*z*z*z-z2+c;
 		z2 = z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_94()  // Iterations
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z = c*z*(2 - z*z);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2167,14 +2093,13 @@ void Formula_95()  // Iterations 133
 	t = (1+c);
 	t1 = csin_t();
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z = z*z*z*z/t1+c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2182,45 +2107,42 @@ void Formula_95()  // Iterations 133
 void Formula_96()  // Iterations 141
 {
 	z2 = z;
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z=z*z*z*z+z2/2+c;
     z2=z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_97()  // Iterations 6
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2 = sum_sqrs_z();
 		z = z*z+c*(1+z2);
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
 
 void Formula_98()  // Iterations 156
 {
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
     z=z*z*z*z/(1+z)+c;
     c=z1;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2232,15 +2154,14 @@ void Formula_99()  // Iterations 97
 	z2 = csin_z();
 	z2 = z - z2;
 
-  d = 1;
+  zd = 1;
   while( n_color++ < maxit
-    && d > minsize)
+    && sum_sqrs_zd() > minsize)
   {
     z1 = z;
 		z2=c+z2/z-z;
 		z=z*c+z2/c;
     zd = z-z1;
-    d = sum_sqrs_zd();
     if (filter) Do_Filter();
   }
 }
@@ -2253,12 +2174,298 @@ void Formula_100()
 		&& d < maxsize)
   {
     z1 = z;
-		__imag__ z += sin(__imag__ z);
+		//__imag__ z += sin(__imag__ z);
+		__real__ z += sin(__real__ z);
     z=z*z+c;
 		//temp = __real__ z;
 		//__imag__ z = __real__ z;
     zd = z-z1;
     d = sum_sqrs_zd();
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_102()  // magneto 1 contributed by Ramon Vives Valls
+{										
+	if (jul == 0)
+		z = 0;
+  zd = 1;
+  while( n_color++ < maxit
+    && sum_sqrs_zd() > minsize)
+  {
+    z1 = z;
+
+		//z = ((z*z+c-1)/(z+z+c-2))*((z*z+c-1)/(z+z+c-2));
+
+		z = (z*z+c-1)/(2*z+c-2);
+		z = z*z;
+
+		zd = z-z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_103()  // magneto 2 contributed by Ramon Vives Valls
+{										
+	if (jul == 0)
+		z = 0;
+
+	c1 = (c-1)*(c-2);
+	c2 = c-1;
+  
+	zd = 1;
+  while( n_color++ < maxit
+    && sum_sqrs_zd() > minsize)
+  {
+    z1 = z;
+		
+		// z = ((z*z*z+(3*(c-1)*z)+((c-1)*(c-2)))/(3*z*z+(3*(c-2)*z)+((c-1)*(c-2))+1))*((z*z*z+(3*(c-1)*z)+((c-1)*(c-2)))/(3*z*z+(3*(c-2)*z)+((c-1)*(c-2))+1));
+
+		z2 = z*z;
+		z = (z*z2+3*c2*z+c1)/(3*z2+3*c2*z+c1+1);			
+		z = z*z;
+    
+		zd = z-z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_104()  // teddy bear fractal
+{										
+	if (jul == 0)
+		z = 1;
+
+  zd = 1;
+  while( n_color++ < maxit
+    && sum_sqrs_zd() > minsize)
+  {
+    z1 = z;
+
+		z = (z*z+c)/(2*z);
+		z = z*z;
+
+		zd = z-z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_105() 
+{						
+	// z*z*z+z*z*c-z; the function
+	// 3*z*z+2*z*c-1; the 1st derivative
+	// 6*z = 2*c;	2nd derivative
+	// z = c/3;
+	zd = 1;
+	z = -z/3;
+
+	while (sum_sqrs_zd() > minsize && n_color++ < maxit)
+  {
+		z1 = z;
+		z2 = z*z;
+		z = z-((z*z2+z2*c-z)/(3*z2+2*z*c-1));
+		zd = z1 - z;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_106() 
+{										
+	// z^5+(z^4)*c-z; the function
+	// 5*(z^4)+4*(z^3)*c-1; the 1st derivative
+	// 20*(z^3) = 12*(z^2)*c;	2nd derivative
+	// z = c*12/20;
+	zd = 1;
+	z = -z*3/5;
+
+	while (sum_sqrs_zd() > minsize && n_color++ < maxit)
+  {
+		z1 = z;
+		z2 = z*z;
+		z4 = z2*z2;
+		z = z-((z4*z+z2*z2*c-z)/(5*z4+4*z2*z*c-1));
+		zd = z1 - z;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_107() // flarium 141, quartet
+{	
+	zd = 1;
+	while (sum_sqrs_zd() > minsize && n_color++ < maxit)
+  {
+		z1 = z;
+		z = csin_z();
+		z = z - c;
+		c = 1/(z*50);
+		zd = z-z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_108()
+{										
+  while( n_color++ < maxit
+    && sum_sqrs_z() < bailout)
+  {
+    z=(z*c)/(1+z)+c;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_109()
+{										
+  while( n_color++ < maxit
+    && sum_sqrs_z() < bailout)
+  {
+		z2 = z*z*c;
+    z=(c+z2)/(1-z2);
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_110()
+{										
+	zd = 1;
+	while (sum_sqrs_zd() > minsize && n_color++ < maxit)
+  {
+		z1 = z;
+		z = z*z;
+		z = (c+z*z*z)/(1+z);
+		zd = z1 - z;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_111()  // Ramon's formula #1
+{
+///////////////////////////////////
+//                               //
+// Test Formula: z=z^2/(1+c*z^2) //
+//                               //
+///////////////////////////////////
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize )
+  {
+    z1 = z;
+    z2 = z * z;
+    z = z2 / ( 1 + c * z2 );
+    zd = z - z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_112()	// Ramon's formula #2
+{
+//////////////////////////////
+//                          //
+// Test Formula: z=c*cos(z) //
+//                          //
+//////////////////////////////
+
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize )
+  {
+    z1 = z;
+    z = c * ccos_z();
+    zd = z - z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_113()  // Ramon's formula #3
+{
+//////////////////////////////
+//                          //
+// Test Formula: z=c*sin(z) //
+//                          //
+//////////////////////////////
+
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize )
+  {
+    z1 = z;
+    z = c * csin_z();
+    zd = z - z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_114()	// Ramon's formula #4
+{
+//////////////////////////////
+//                          //
+// Test Formula: z=c*exp(z) //
+//                          //
+//////////////////////////////
+
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize )
+  {
+    z1 = z;
+    z = c * cexp_z();
+    zd = z - z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_115()	// Ramon's formula #5
+{  
+///////////////////////////
+//                       //
+// Test Formula: z=z^2+c //
+//               c=c/2+z //
+// (spider)              //
+//                       //
+///////////////////////////
+
+  if (jul == 0)
+		z = c;
+
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize )
+  {
+    z1 = z;
+    z = z * z + c;
+    c = 0.5 * c + z;
+    zd = z - z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_116()	// Ramon's formula #6
+{
+//////////////////////////////////
+//                              //
+// Test Formula: z=(c/sin(z))^2 //
+//                              //
+//////////////////////////////////
+
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize && sum_sqrs_z() < bailout )
+  {
+    z1 = z;
+    z = c/csin_z();
+    z = z * z;
+    zd = z - z1;
+    if (filter) Do_Filter();
+  }
+}
+
+void Formula_117()	// Ramon's formula #7
+{
+//////////////////////////////////
+//                              //
+// Test Formula: z=(c/cos(z))^2 //
+//                              //
+//////////////////////////////////
+
+  zd = 1;
+  while ( n_color++ < maxit && sum_sqrs_zd() > minsize && sum_sqrs_z() < bailout )
+  {
+    z1 = z;
+    z = c/ccos_z();
+    z = z * z;
+    zd = z - z1;
     if (filter) Do_Filter();
   }
 }

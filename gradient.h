@@ -41,7 +41,6 @@ public:
 	int		m_Start_Blue;
 	int		m_Start_Green;
 	int		m_Start_Red;
-	CString	m_Status;
 	//}}AFX_DATA
 
 // Implementation
@@ -58,6 +57,7 @@ protected:
 	afx_msg void OnReverse();
 	afx_msg void OnForward();
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
+	afx_msg void OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

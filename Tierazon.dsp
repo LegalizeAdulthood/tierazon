@@ -123,6 +123,10 @@ SOURCE=.\MainFrm.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Movie.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Orient.cpp
 # End Source File
 # Begin Source File
@@ -159,6 +163,10 @@ SOURCE=.\TierazonView.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\Unique.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\Xysize.cpp
 # End Source File
 # End Group
@@ -175,7 +183,15 @@ SOURCE=.\Dib.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\Expression.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\MainFrm.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Movie.h
 # End Source File
 # Begin Source File
 
@@ -200,6 +216,10 @@ SOURCE=.\TierazonDoc.h
 # Begin Source File
 
 SOURCE=.\TierazonView.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\Unique.h
 # End Source File
 # End Group
 # Begin Group "Resource Files"
@@ -242,4 +262,14 @@ SOURCE=.\ReadMe.txt
 # End Project
 # Section Tierazon : {A82AB342-BB35-11CF-8771-00A0C9039735}
 # 	1:26:CG_IDR_POPUP_TIERAZON_VIEW:102
+# End Section
+# Section Tierazon : {00000000-0001-0000-0000-000000000000}
+# 	1:17:CG_IDS_DISK_SPACE:107
+# 	1:19:CG_IDS_PHYSICAL_MEM:104
+# 	1:25:CG_IDS_DISK_SPACE_UNAVAIL:108
+# 	2:14:PhysicalMemory:CG_IDS_PHYSICAL_MEM
+# 	2:9:DiskSpace:CG_IDS_DISK_SPACE
+# 	2:16:SpaceUnavailable:CG_IDS_DISK_SPACE_UNAVAIL
+# 	2:7:NewFunc:1
+# 	2:10:SysInfoKey:1234
 # End Section

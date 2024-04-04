@@ -14,6 +14,7 @@
 #include "resource.h"
 #include "orient.h"
 #include "convolut.h"
+#include "movie.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -29,6 +30,7 @@ IMPLEMENT_DYNCREATE(CTierazonView, CScrollView)
 BEGIN_MESSAGE_MAP(CTierazonView, CScrollView)
 	ON_WM_CONTEXTMENU()
 	//{{AFX_MSG_MAP(CTierazonView)
+  ON_MESSAGE(WM_USER_CANCELMOVIE, CancelMovie)
 	ON_COMMAND(ID_SAVE_DIB, OnSaveDib)
 	ON_COMMAND(ID_WINDOW_SIZEDESKTOP, OnWindowSizedesktop)
 	ON_WM_LBUTTONDOWN()
@@ -477,6 +479,109 @@ BEGIN_MESSAGE_MAP(CTierazonView, CScrollView)
 	ON_UPDATE_COMMAND_UI(ID_DRAW_99, OnUpdateDraw99)
 	ON_COMMAND(ID_DRAW_100, OnDraw100)
 	ON_UPDATE_COMMAND_UI(ID_DRAW_100, OnUpdateDraw100)
+	ON_COMMAND(ID_DRAW_101, OnDraw101)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_101, OnUpdateDraw101)
+	ON_COMMAND(ID_DRAW_UNIQUE, OnDrawUnique)
+	ON_COMMAND(ID_FILTER_39, OnFilter39)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_39, OnUpdateFilter39)
+	ON_COMMAND(ID_FILTER_40, OnFilter40)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_40, OnUpdateFilter40)
+	ON_COMMAND(ID_FILTER_41, OnFilter41)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_41, OnUpdateFilter41)
+	ON_COMMAND(ID_FILTER_42, OnFilter42)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_42, OnUpdateFilter42)
+	ON_COMMAND(ID_FILTER_43, OnFilter43)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_43, OnUpdateFilter43)
+	ON_COMMAND(ID_FRACTALS_MOVIE, OnFractalsMovie)
+	ON_COMMAND(ID_FRACTAL_STARTGENERATINGAMOVIE, OnFractalStartgeneratingamovie)
+	ON_UPDATE_COMMAND_UI(ID_FRACTAL_STARTGENERATINGAMOVIE, OnUpdateFractalStartgeneratingamovie)
+	ON_UPDATE_COMMAND_UI(ID_FRACTALS_MOVIE, OnUpdateFractalsMovie)
+	ON_COMMAND(ID_FRACTAL_VIDEOPLAYER, OnFractalVideoplayer)
+	ON_COMMAND(ID_CONVOLVE_AUTO_ANTIALIAS, OnConvolveAutoAntialias)
+	ON_UPDATE_COMMAND_UI(ID_CONVOLVE_AUTO_ANTIALIAS, OnUpdateConvolveAutoAntialias)
+	ON_COMMAND(ID_VIEW_JULIAVIDEO, OnViewJuliavideo)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_JULIAVIDEO, OnUpdateViewJuliavideo)
+	ON_COMMAND(ID_VIEW_ORIENTATIONVIDEO, OnViewOrientationvideo)
+	ON_UPDATE_COMMAND_UI(ID_VIEW_ORIENTATIONVIDEO, OnUpdateViewOrientationvideo)
+	ON_COMMAND(ID_DRAW_102, OnDraw102)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_102, OnUpdateDraw102)
+	ON_COMMAND(ID_DRAW_103, OnDraw103)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_103, OnUpdateDraw103)
+	ON_COMMAND(ID_DRAW_104, OnDraw104)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_104, OnUpdateDraw104)
+	ON_COMMAND(ID_FILTER_44, OnFilter44)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_44, OnUpdateFilter44)
+	ON_COMMAND(ID_FILTER_45, OnFilter45)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_45, OnUpdateFilter45)
+	ON_COMMAND(ID_FILTER_46, OnFilter46)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_46, OnUpdateFilter46)
+	ON_COMMAND(ID_FILTER_47, OnFilter47)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_47, OnUpdateFilter47)
+	ON_COMMAND(ID_DRAW_105, OnDraw105)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_105, OnUpdateDraw105)
+	ON_COMMAND(ID_DRAW_106, OnDraw106)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_106, OnUpdateDraw106)
+	ON_COMMAND(ID_DRAW_107, OnDraw107)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_107, OnUpdateDraw107)
+	ON_COMMAND(ID_DRAW_108, OnDraw108)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_108, OnUpdateDraw108)
+	ON_COMMAND(ID_DRAW_109, OnDraw109)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_109, OnUpdateDraw109)
+	ON_COMMAND(ID_DRAW_110, OnDraw110)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_110, OnUpdateDraw110)
+	ON_COMMAND(ID_DRAW_111, OnDraw111)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_111, OnUpdateDraw111)
+	ON_COMMAND(ID_DRAW_112, OnDraw112)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_112, OnUpdateDraw112)
+	ON_COMMAND(ID_DRAW_113, OnDraw113)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_113, OnUpdateDraw113)
+	ON_COMMAND(ID_DRAW_114, OnDraw114)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_114, OnUpdateDraw114)
+	ON_COMMAND(ID_DRAW_115, OnDraw115)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_115, OnUpdateDraw115)
+	ON_COMMAND(ID_DRAW_116, OnDraw116)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_116, OnUpdateDraw116)
+	ON_COMMAND(ID_DRAW_117, OnDraw117)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_117, OnUpdateDraw117)
+	ON_COMMAND(ID_FILTER_48, OnFilter48)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_48, OnUpdateFilter48)
+	ON_COMMAND(ID_FILTER_49, OnFilter49)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_49, OnUpdateFilter49)
+	ON_COMMAND(ID_OPTIONS_11, OnOptions11)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_11, OnUpdateOptions11)
+	ON_COMMAND(ID_OPTIONS_12, OnOptions12)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_12, OnUpdateOptions12)
+	ON_COMMAND(ID_OPTIONS_13, OnOptions13)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_13, OnUpdateOptions13)
+	ON_COMMAND(ID_OPTIONS_14, OnOptions14)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_14, OnUpdateOptions14)
+	ON_COMMAND(ID_OPTIONS_15, OnOptions15)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_15, OnUpdateOptions15)
+	ON_COMMAND(ID_OPTIONS_16, OnOptions16)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_16, OnUpdateOptions16)
+	ON_COMMAND(ID_OPTIONS_17, OnOptions17)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_17, OnUpdateOptions17)
+	ON_COMMAND(ID_OPTIONS_18, OnOptions18)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_18, OnUpdateOptions18)
+	ON_COMMAND(ID_OPTIONS_19, OnOptions19)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_19, OnUpdateOptions19)
+	ON_COMMAND(ID_OPTIONS_20, OnOptions20)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_20, OnUpdateOptions20)
+	ON_COMMAND(ID_DRAW_UNDO, OnDrawUndo)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_UNDO, OnUpdateDrawUndo)
+	ON_COMMAND(ID_FILTER_50, OnFilter50)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_50, OnUpdateFilter50)
+	ON_COMMAND(ID_LOAD_DLL, OnLoadDll)
+	ON_COMMAND(ID_FILTER_51, OnFilter51)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_51, OnUpdateFilter51)
+	ON_COMMAND(ID_FILTER_52, OnFilter52)
+	ON_UPDATE_COMMAND_UI(ID_FILTER_52, OnUpdateFilter52)
+	ON_COMMAND(ID_COLOR_REGULAR, OnColorRegular)
+	ON_UPDATE_COMMAND_UI(ID_COLOR_REGULAR, OnUpdateColorRegular)
+	ON_COMMAND(ID_COLOR_LIGHT, OnColorLight)
+	ON_UPDATE_COMMAND_UI(ID_COLOR_LIGHT, OnUpdateColorLight)
+	ON_COMMAND(ID_DRAW_118, OnDraw118)
+	ON_UPDATE_COMMAND_UI(ID_DRAW_118, OnUpdateDraw118)
 	//}}AFX_MSG_MAP
 	// Standard printing commands
 	ON_COMMAND(ID_FILE_PRINT, CScrollView::OnFilePrint)
@@ -496,6 +601,16 @@ CTierazonView::CTierazonView()
 {
 	m_pGradView			= new CGradient(this);
 	m_pConvolutView = new CConvolut(this);
+	m_pMovieView    = new CMovie(this);
+
+	bMovieView			= FALSE;	
+	bFirstView			= TRUE;
+	frames					= 100;
+	frame						= 0;
+	AVIFileName			= "";
+	bLockStart			= FALSE;
+	bLockFinish			= FALSE;
+	bStartMovie			= FALSE;
 
 	bFitToPage = FALSE;
 	bStretchToFit = FALSE;
@@ -509,12 +624,17 @@ CTierazonView::CTierazonView()
 	dim_save.cx = 0;
 	dim_save.cy = 0;
 
+	//nRedStart = 0;
+	//nGrnStart = 40;
+	//nBluStart = 30;
+
 	nRedStart = 143;
 	nGrnStart = 58;
 	nBluStart = 27;
 
 	nColorOrder = 4;
 	nColorMethod = 0;
+	nColorMode = 0;
 	nColorMethodSave = 0;
 	nFilterSave = 0;
 	nDistortionSave = 0;
@@ -537,7 +657,10 @@ CTierazonView::CTierazonView()
 	bGrnStart = TRUE;
 	bBluStart = TRUE;
 
-	bGenesisMode = TRUE;
+	bAutoAntialias			= FALSE;
+	bAutoAntialias_Init	= FALSE;
+	nUsingBuffers				= TRUE;
+	bGenesisMode				= TRUE;
 
 	bEdgeDetect		= FALSE;
 	bEmboss				= FALSE;
@@ -577,12 +700,29 @@ CTierazonView::CTierazonView()
 	CIMIN  	= -2; //-1.33333;	//    // top
 	CRMAX  	=  2; // 1.0;			//	  // right
 	CIMAX  	=  2; // 1.33333;	//	  // bottom
+
 	dMagnification = 1;
+	dMagnification_Start  = 1;
+	dMagnification_Finish = 1;
 
 	dMIN		= 1e-11;
 		
-	CRMID = CRMID_Finish = ((CRMAX - CRMIN) / 2.0) + CRMIN;
-  CIMID	= CIMID_Finish = ((CIMAX - CIMIN) / 2.0) + CIMIN;
+	CRMID = CRMID_Start = CRMID_Finish = ((CRMAX - CRMIN) / 2.0) + CRMIN;
+  CIMID	= CIMID_Start = CIMID_Finish = ((CIMAX - CIMIN) / 2.0) + CIMIN;
+
+	CRMID_MovieStart	= 0;
+	CRMID_MovieFinish = 0;
+
+	CIMID_MovieStart	= 0;
+	CIMID_MovieFinish = 0;
+
+	dMovieMagnifStart  = 0;
+	dMovieMagnifFinish = 0;
+	dwMovieRate = 6;           // Frames per Second
+
+	bOrientationVideoMode		= FALSE;
+	bJuliaVideoMode					= FALSE;
+
  	CRMIN_JUL = -1.5;
 	CIMIN_JUL = -1.5;
 	CRMAX_JUL =  1.5;
@@ -602,8 +742,8 @@ CTierazonView::CTierazonView()
 	NMAX_Save = 0;
 	dBailout = 4;
 
-	dLower   = 20;
-	dUpper	 = 150;
+	dLower   = 0;
+	dUpper	 = 256;
 
 	jul 		 = 0;
 	jul_save = 1;
@@ -629,6 +769,8 @@ CTierazonView::CTierazonView()
 	dBay100		= 1;
 	dBay1000	= 1;
 
+	nFormulaType = 0;
+
 	nFDOption = 0;
 	bDimensionVariant = 0;
 
@@ -649,45 +791,20 @@ CTierazonView::CTierazonView()
   strFormulae = "z*z+c";
 
 	// DLL initialization
+	szTemp = "rsx_fv25.dll";
+	Load_DLL();
 
-  hLib = LoadLibrary("rsx_file.dll");
-  if (!hLib) 
-	{
-		DWORD err = GetLastError();
-    wsprintf(buf, "Cannot load dll fails err=0x%lX = %ld", err, err);
-		AfxMessageBox(buf);
-        return;
-  }
-
-  lpfnFormulae = (DLLFUNC) GetProcAddress(hLib, "_formulae");
-  if (!lpfnFormulae) 
-	{
-		wsprintf(buf, "Error: GetProcAddress(_formulae)");
-		AfxMessageBox(buf);
-		return;
-  }
-
-  lpfnColorUpdate = (DLLCOLOR) GetProcAddress(hLib, "_color_update");
-  if (!lpfnColorUpdate) 
-	{
-		wsprintf(buf, "Error: GetProcAddress(_color_update)");
-		AfxMessageBox(buf);
-		return;
-  }
-
-  lpfnInitialize = (DLLINIT) GetProcAddress(hLib, "_initialize");
-  if (!lpfnFormulae) 
-	{
-		wsprintf(buf, "Error: GetProcAddress(_initialize)");
-		AfxMessageBox(buf);
-		return;
-  }
+	nDistortion_sav = nDistortion;
+	nFilter_sav = nFilter;
+	nColorMethod_sav = nColorMethod;
+	nFDOption_sav = nFDOption;
 }
 
 CTierazonView::~CTierazonView()
 {
 	delete m_pGradView;
 	delete m_pConvolutView;
+	delete m_pMovieView;
 
 	if (bRed)
 		delete bRed;
@@ -763,6 +880,12 @@ void CTierazonView::OnDraw(CDC* pDC)
 	screen.cx = rrect.Width();
 	screen.cy = rrect.Height();
 
+	if (m_pMovieView->GetSafeHwnd() && !bDraw)
+	{
+		bLockStart	= m_pMovieView->m_LockStart;
+		bLockFinish	= m_pMovieView->m_LockFinish;
+	}
+
 	if (pDoc->m_dib.m_hDrawDib)
 	{
 		//Set the output and DIB rectangle sizes to be
@@ -818,7 +941,7 @@ void CTierazonView::OnDraw(CDC* pDC)
 		screen.cx = rrect.Width();
 		screen.cy = rrect.Height();
 		
-		if (DIBRect.right > 1024 || DIBRect.bottom > 1024)
+		if (DIBRect.right > 640 || DIBRect.bottom > 480)
 		{
 			//CWaitCursor cursor;	// this will automatically display a wait cursor		
 			if (pDoc->m_dib.m_hDrawDib)
@@ -935,11 +1058,29 @@ void CTierazonView::OnDraw(CDC* pDC)
 				CRMID = ((CRMAX_NEW - CRMIN_NEW) / 2.0) + CRMIN_NEW;
 				CIMID	= ((CIMAX_NEW - CIMIN_NEW) / 2.0) + CIMIN_NEW;
 
+				if (!bLockStart)	
+				{
+					CRMID_Start = ((CRMAX_NEW - CRMIN_NEW) / 2.0) + CRMIN_NEW;
+	    		CIMID_Start	= ((CIMAX_NEW - CIMIN_NEW) / 2.0) + CIMIN_NEW;
+				}
+		
+				if (!bLockFinish)	
+				{
+					CRMID_Finish = ((CRMAX_NEW - CRMIN_NEW) / 2.0) + CRMIN_NEW;
+		  		CIMID_Finish = ((CIMAX_NEW - CIMIN_NEW) / 2.0) + CIMIN_NEW;
+				}
+
 				// Calculate the Magnification (2 / average of width & length)
  				dMag_new = ((fabs(CRMAX_NEW - CRMIN_NEW) / 2) 
  										+ (fabs(CIMAX_NEW - CIMIN_NEW) / 2)) / 2;
 				if (dMag_new) 
 					dMag_new = (1 / dMag_new) * 2;
+
+				if (!bLockStart)
+					dMagnification_Start = dMagnification;		
+			
+				if (!bLockFinish)
+					dMagnification_Finish = dMagnification;		
  			   				
 				if (!pDC->IsPrinting())   // if not printer DC
 					sprintf(cstr, 
@@ -984,7 +1125,10 @@ void CTierazonView::OnDraw(CDC* pDC)
 
 			}
 		}
-	}
+
+		if (m_pMovieView->GetSafeHwnd())
+			UpdateMovieData();	
+	}			
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1095,7 +1239,7 @@ void CTierazonView::OnInitialUpdate()
     }
     else
     {
-			bNewView = FALSE;
+			//bNewView = FALSE;
 			// Read the parameters from the ASCII file
 			Loadparameters();
 
@@ -1175,7 +1319,8 @@ void CTierazonView::OnInitialUpdate()
 			szTemp.GetBufferSetLength(szTempFileName.GetLength()-3);
 			szTemp += "bmp";
 			
-			if (!pDoc->OnOpenDocument(szTemp))
+			//if (!pDoc->OnOpenDocument(szTemp))
+			if (TRUE)
 			{
 				bDraw = TRUE;
 				bLaunch = FALSE;
@@ -1500,6 +1645,7 @@ void CTierazonView::OnImageSize()
 	{		
 		nImageSize = px.m_ImageSize;
 		bInitialized = FALSE;
+		
 	  switch (nImageSize)
   	{
   		case 0:
@@ -1541,7 +1687,6 @@ void CTierazonView::OnImageSize()
   		case 9:
 				dim.cx = 3564;
 				dim.cy = 2784;
-
   			break;
 
 	  	case 10:
@@ -1583,6 +1728,12 @@ void CTierazonView::OnImageSize()
 
     //if (nDistortion == (-1))
   		//OnViewBackground();
+
+		if (m_pMovieView->GetSafeHwnd())
+		{
+			m_pMovieView->DestroyWindow();	// Close the movie window to prevent crashing due to new size
+			OnFractalsMovie();							// reopen it
+		}
 
     if (nDistortion >= 0)
     {
@@ -1698,6 +1849,10 @@ void CTierazonView::ViewNew()
 	if (m_pGradView->GetSafeHwnd())
 		m_pGradView->DestroyWindow();	
 	
+	// Close the movie window to avoid confusion if one is open
+	if (m_pMovieView->GetSafeHwnd())
+		m_pMovieView->DestroyWindow();	
+
 	GetParent()->SendMessage(WM_COMMAND, ID_FILE_NEW);	
 
 }
@@ -2020,6 +2175,45 @@ void CTierazonView::Saveparameters()
 	szTemp = cstr;
 	outFile.WriteString(szTemp + '\n');			
 
+	// Write the bGrayScale variable
+	sprintf(cstr,"%d", bGrayScale);
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+  ////////////////////////////////////////
+  // Parser Variables
+	sprintf(cstr,"%.16Lg", u_real);    // 
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	sprintf(cstr,"%.16Lg", u_imag);    // 
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	sprintf(cstr,"%.16Lg", v_real);    // 
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	sprintf(cstr,"%.16Lg", v_imag);    // 
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	sprintf(cstr,"%.16Lg", w_real);    // 
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	sprintf(cstr,"%.16Lg", w_imag);    // 
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	outFile.WriteString(strFormulae + '\n');			
+
+	// Write the nFormulaType variable
+	sprintf(cstr,"%d", nFormulaType);
+	szTemp = cstr;
+	outFile.WriteString(szTemp + '\n');			
+
+	
 }
 
 void CTierazonView::OnFileLoadcolors() 
@@ -2154,6 +2348,7 @@ void CTierazonView::OnFileLoadparameters()
 
 			bDraw = TRUE;
 			bLaunch = FALSE;
+			bInitialized = FALSE;
 		}	
 	}
 }
@@ -2358,6 +2553,8 @@ void CTierazonView::Loadparameters()
 	// Read bColorize BOOL Variable
   outFile.ReadString ( cstr, (sizeof(cstr)-1));
 	sscanf (cstr, "%d", &bColorize);
+	if (bColorize != 0 && bColorize != 1)
+		bColorize = 0;
 			
 	// Read the nFDOption Variable
   outFile.ReadString ( cstr, (sizeof(cstr)-1));
@@ -2370,6 +2567,70 @@ void CTierazonView::Loadparameters()
 	// Read the bDimensionVariant Variable
   outFile.ReadString ( cstr, (sizeof(cstr)-1));
 	sscanf (cstr, "%d", &bDimensionVariant);
+	if (bDimensionVariant != 0 && bDimensionVariant != 1)
+		bDimensionVariant = 0;
+			
+	// Read the bGrayScale Variable
+  outFile.ReadString ( cstr, (sizeof(cstr)-1));
+	sscanf (cstr, "%d", &bGrayScale);
+	if (bGrayScale != 0 && bGrayScale != 1)
+		bGrayScale = 0;
+
+  ///////////////////////////////////
+  // Parser Variables
+	outFile.ReadString ( cstr, (sizeof(cstr)-1));
+  u_real = atof(cstr);	
+
+	outFile.ReadString ( cstr, (sizeof(cstr)-1));
+  u_imag = atof(cstr);	
+  
+	outFile.ReadString ( cstr, (sizeof(cstr)-1));
+  v_real = atof(cstr);	
+
+	outFile.ReadString ( cstr, (sizeof(cstr)-1));
+  v_imag = atof(cstr);	
+  
+	outFile.ReadString ( cstr, (sizeof(cstr)-1));
+  w_real = atof(cstr);	
+
+	outFile.ReadString ( cstr, (sizeof(cstr)-1));
+  w_imag = atof(cstr);	
+
+  uu.set_real(u_real);
+  uu.set_imag(u_imag);
+
+  vv.set_real(v_real);
+  vv.set_imag(v_imag);
+
+  ww.set_real(w_real);
+  ww.set_imag(w_imag);  
+
+	if (outFile.ReadString ( cstr, (sizeof(cstr)-1)) == NULL)
+	{
+		//AfxMessageBox("Error Reading from Parameter File:" + szTemp);
+    //return;
+    wsprintf(cstr,"z*z+c");
+  }
+      	
+	strFormulae = cstr;
+
+	// Search for the Line Feed loacation 
+	iLFLoc = strFormulae.ReverseFind('\n');
+	// Replace the Line Feed character with NULL for viewing
+	if (iLFLoc >= 0) 
+	  strFormulae.GetBufferSetLength(strFormulae.GetLength()-1);   
+
+  int i_try = 0;      
+  ParsedExpr = ParseExpression( strFormulae, i_try );
+
+	// Read the nFormuleType Variable
+  outFile.ReadString ( cstr, (sizeof(cstr)-1));
+	sscanf (cstr, "%d", &nFormulaType);
+	if (nFormulaType != 0 && nFormulaType != 1)
+		nFormulaType = 0;
+  
+	/////////////////////////////////////////
+
 			
 }
 
@@ -2419,11 +2680,12 @@ void CTierazonView::OnViewJulia()
 	CRMID_OLD = 0;
 	CIMID_OLD = 0;
 
+	bZoomingMode = TRUE;
+
 	//////////////////////////////////////////
 	if (bNewView)
 	{
 		// Create new view and return			
-		bZoomingMode = TRUE;
 		bJuliaMode = TRUE;
 
 		CRMIN_OLD = CRMIN;
@@ -2647,7 +2909,7 @@ void CTierazonView::OnUpdateDrawAbort(CCmdUI* pCmdUI)
 
 long CTierazonView::OnApply_ShiftView(UINT wParam, LONG lParam)
 {
-	if (dim.cx > 1024 || dim.cy > 1024)
+	if (dim.cx > 640 || dim.cy > 480)
 		return 0L;
 	
 	CTierazonDoc* pDoc = GetDocument();
@@ -2721,7 +2983,7 @@ long CTierazonView::OnApply_ShiftView(UINT wParam, LONG lParam)
 
 void CTierazonView::Apply_Color() 
 {
-	if (dim.cx > 1024 || dim.cy > 1024)
+	if (dim.cx > 640 || dim.cy > 480)
 		return;
 	
 	CTierazonDoc* pDoc = GetDocument();
@@ -2737,7 +2999,7 @@ void CTierazonView::Apply_Color()
 		if (!pDoc->m_dib.ApplyDibColors(nRed, nGrn, nBlu, nRedStart, 
 																nGrnStart, nBluStart,
 																iIter_Data, rIter_Data, gIter_Data, bIter_Data,
-																nColorOrder, nColorMethod))
+																nColorOrder, nColorMode))
 			AfxMessageBox("Color shift error");
 	}
 
@@ -2755,7 +3017,7 @@ void CTierazonView::Apply_Color()
 
 void CTierazonView::Shift_Step() 
 {
-	if (dim.cx > 1024 || dim.cy > 1024)
+	if (dim.cx > 640 || dim.cy > 480)
 		return;
 	
 	CTierazonDoc* pDoc = GetDocument();
@@ -2841,7 +3103,7 @@ void CTierazonView::Shift_Step()
 	if (!pDoc->m_dib.ApplyDibColors(nRed, nGrn, nBlu, nRedStart, 
 														nGrnStart, nBluStart,
 														iIter_Data, rIter_Data, gIter_Data, bIter_Data,
-														nColorOrder, nColorMethod))
+														nColorOrder, nColorMode))
 		AfxMessageBox("Color shift error");
 
 	if (m_pGradView->GetSafeHwnd() != 0)
@@ -2859,7 +3121,7 @@ void CTierazonView::Shift_Step()
 
 void CTierazonView::OnShiftStart() 
 {
-	if (dim.cx > 1024 || dim.cy > 1024)
+	if (dim.cx > 640 || dim.cy > 480)
 		return;
 
 	if (!bDraw && uTimer1 == NULL)
@@ -2945,7 +3207,7 @@ void CTierazonView::OnUpdateImageColorparameters(CCmdUI* pCmdUI)
 
 long CTierazonView::OnApply_GradView(UINT wParam, LONG lParam)
 {
-	if (dim.cx > 1024 || dim.cy > 1024)
+	if (dim.cx > 640 || dim.cy > 480)
 		return 0L;
 	
 	CTierazonDoc* pDoc = GetDocument();
@@ -2979,7 +3241,7 @@ long CTierazonView::OnApply_GradView(UINT wParam, LONG lParam)
 		if (!pDoc->m_dib.ApplyDibColors(nRed, nGrn, nBlu, nRedStart, 
 																nGrnStart, nBluStart,
 																iIter_Data, rIter_Data, gIter_Data, bIter_Data,
-																nColorOrder, nColorMethod))
+																nColorOrder, nColorMode))
 			AfxMessageBox("Color shift error");
 
 		Invalidate(FALSE);
@@ -3016,6 +3278,18 @@ void CTierazonView::Clearselection(BOOL bValid)
 	CRMID = ((CRMAX - CRMIN) / 2.0) + CRMIN;
 	CIMID	= ((CIMAX - CIMIN) / 2.0) + CIMIN;
 
+	if (!bLockStart)	
+	{
+		CRMID_Start = ((CRMAX - CRMIN) / 2.0) + CRMIN;
+		CIMID_Start	= ((CIMAX - CIMIN) / 2.0) + CIMIN;
+	}
+	
+	if (!bLockFinish)	
+	{
+		CRMID_Finish = ((CRMAX - CRMIN) / 2.0) + CRMIN;
+		CIMID_Finish = ((CIMAX - CIMIN) / 2.0) + CIMIN;
+	}
+
 	pDoc->m_tracker.m_rect.SetRectEmpty();	
 	bTracker = FALSE;
 	
@@ -3048,5 +3322,132 @@ void CTierazonView::OnViewOrient()
 		bDraw = TRUE;
 		bLaunch = FALSE;
 	}	
+}
+
+void CTierazonView::OnDrawUndo() 
+{
+	nDistortion		= nDistortion_sav;
+	nFilter				= nFilter_sav;
+	nColorMethod	= nColorMethod_sav;
+	nFDOption			= nFDOption_sav;
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateDrawUndo(CCmdUI* pCmdUI) 
+{
+	if (nDistortion_sav == 0)
+		pCmdUI->Enable(FALSE);
+	else
+		pCmdUI->Enable(TRUE);
+}
+
+void CTierazonView::SaveForUndo()
+{
+	nDistortion_sav		= nDistortion;
+	nFilter_sav				= nFilter;
+	nColorMethod_sav	= nColorMethod;
+	nFDOption_sav			= nFDOption;
+}
+
+void CTierazonView::OnLoadDll() 
+{
+	// DLL initialization
+
+	CFileDialog dlg
+	    (TRUE,
+	   	"*.dll",
+	   	szTemp,          
+	     OFN_HIDEREADONLY,
+	    "Fractal DLL Files (*.dll)|*.dll|All Files (*.*)|*.*||");
+
+  if (dlg.DoModal() == IDOK)
+  	szTemp = dlg.GetPathName();              
+	{	
+		Load_DLL();
+	}		
+}
+
+void CTierazonView::Load_DLL()
+{
+  FreeLibrary(hLib);
+  hLib = LoadLibrary(szTemp);
+  if (!hLib) 
+	{
+		DWORD err = GetLastError();
+    wsprintf(buf, "Cannot load dll fails err=0x%lX = %ld", err, err);
+		AfxMessageBox(buf);
+        return;
+  }
+
+  lpfnFormulae = (DLLFUNC) GetProcAddress(hLib, "_formulae");
+  if (!lpfnFormulae) 
+	{
+		wsprintf(buf, "Error: GetProcAddress(_formulae)");
+		AfxMessageBox(buf);
+		return;
+  }
+
+  lpfnColorUpdate = (DLLCOLOR) GetProcAddress(hLib, "_color_update");
+  if (!lpfnColorUpdate) 
+	{
+		wsprintf(buf, "Error: GetProcAddress(_color_update)");
+		AfxMessageBox(buf);
+		return;
+  }
+
+  lpfnInitialize = (DLLINIT) GetProcAddress(hLib, "_initialize");
+  if (!lpfnFormulae) 
+	{
+		wsprintf(buf, "Error: GetProcAddress(_initialize)");
+		AfxMessageBox(buf);
+		return;
+  }
+
+  lpfnFilter = (DLLFILTER) GetProcAddress(hLib, "_filter");
+  if (!lpfnFilter) 
+	{
+		wsprintf(buf, "Error: GetProcAddress(_filter)");
+		AfxMessageBox(buf);
+		return;
+  }
+
+  lpfnComplete = (DLLCOMPLETE) GetProcAddress(hLib, "_filter_complete");
+  if (!lpfnComplete) 
+	{
+		wsprintf(buf, "Error: GetProcAddress(_filter_complete)");
+		AfxMessageBox(buf);
+		return;
+  }
+}
+
+void CTierazonView::OnColorRegular() 
+{
+	nColorMode = 0;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateColorRegular(CCmdUI* pCmdUI) 
+{
+	if (nColorMode == 0)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
+}
+
+void CTierazonView::OnColorLight() 
+{
+	nColorMode = I_SEE_DA_LIGHT;	
+	bDraw = TRUE;
+	bLaunch = FALSE;
+}
+
+void CTierazonView::OnUpdateColorLight(CCmdUI* pCmdUI) 
+{
+	if (nColorMode == I_SEE_DA_LIGHT)
+		pCmdUI->SetCheck(TRUE);
+	else
+		pCmdUI->SetCheck(FALSE);
 }
 

@@ -43,57 +43,23 @@ public:
          {
          *this=cmplx(rvalue*x, rvalue*y);//return *this;
          }
-  inline cmplx operator+(cmplx rvalue)
+  inline cmplx& operator+(cmplx& rvalue)
          {return cmplx(x+rvalue.x,y+rvalue.y);}
-  inline cmplx operator-(cmplx rvalue)
+  inline cmplx& operator-(cmplx& rvalue)
          {return cmplx(x-rvalue.x,y-rvalue.y);}
-  inline cmplx operator-() //unary minus
+  inline cmplx& operator-() //unary minus
          {return cmplx(-x,-y);}
-  inline cmplx operator*(cmplx rvalue)
+  inline cmplx& operator*(cmplx rvalue)
          {return cmplx(
           rvalue.x*x-rvalue.y*y,
           rvalue.x*y+rvalue.y*x);}
-  inline friend cmplx operator/(double &dividend,cmplx &divisor)
+  inline friend cmplx operator/(double dividend,cmplx divisor)
          { 
-//					if (divisor.x < zerotol && divisor.x > -zerotol)
-//					{
-//						if (divisor.x >= 0)
-//							divisor.x = zerotol;
-//						else
-//							divisor.x = -zerotol;					
-//					}
-
-//					if (divisor.y < zerotol && divisor.y > -zerotol)
-//					{
-//						if (divisor.y >= 0)
-//							divisor.y = zerotol;
-//						else
-//							divisor.y = -zerotol;					
-//					}
-
           return cmplx((dividend*divisor.x)/(divisor.x*divisor.x+divisor.y*divisor.y),
            (-dividend*divisor.y)/(divisor.x*divisor.x+divisor.y*divisor.y));
          }
   inline cmplx operator/(cmplx divisor)
 				{ 
-					//////////////////////////////////////////
-//					if (divisor.x < zerotol && divisor.x > -zerotol)
-//					{
-//						if (divisor.x >= 0)
-//							divisor.x = zerotol;
-//						else
-//							divisor.x = -zerotol;					
-//					}
-
-//					if (divisor.y < zerotol && divisor.y > -zerotol)
-//					{
-//						if (divisor.y >= 0)
-//							divisor.y = zerotol;
-//						else
-//							divisor.y = -zerotol;					
-//					}
-					//////////////////////////////////////////	
-
          return cmplx((divisor.x*x+divisor.y*y)/(divisor.x*divisor.x+divisor.y*divisor.y),
             (divisor.x*y-divisor.y*x)/(divisor.x*divisor.x+divisor.y*divisor.y));
          }
@@ -119,6 +85,12 @@ public:
 			inline double abs() {return (x*x+y*y);}
 			inline double magnitude1() {return sqrt(x*x+y*y);}
 
+			inline cmplx Real() {
+				return cmplx (x, 0); }
+
+			inline cmplx Imag() {
+				return cmplx (y, 0); }
+
 			inline cmplx cexp() {
 				return cmplx(exp(x)*cos(y),exp(x)*sin(y));}
 
@@ -130,7 +102,7 @@ public:
       
 			inline cmplx conjugate()
          {return cmplx(x,-y);}
-      inline friend cmplx operator*(cmplx num,double real)
+      inline friend cmplx operator*(cmplx& num,double real)
          {return cmplx(num.x*real,num.y*real);}
       inline friend cmplx operator*(double real,cmplx num)
          {return cmplx(num.x*real,num.y*real);}
