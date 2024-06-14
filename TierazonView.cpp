@@ -3370,7 +3370,10 @@ void CTierazonView::OnLoadDll()
 
 void CTierazonView::Load_DLL()
 {
-  FreeLibrary(hLib);
+	if (hLib)
+	{
+	    FreeLibrary(hLib);
+	}
   hLib = LoadLibrary(szTemp);
   if (!hLib) 
 	{

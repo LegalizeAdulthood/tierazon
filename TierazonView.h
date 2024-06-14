@@ -42,7 +42,7 @@ public:
 // Operations
 public:
 	// DLL parameters /////////////////////////
-  HINSTANCE			hLib;
+	HINSTANCE			hLib{};
 
   DLLFUNC				lpfnFormulae;
 	DLLCOLOR			lpfnColorUpdate;
