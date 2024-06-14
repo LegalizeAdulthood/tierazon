@@ -153,10 +153,6 @@ public:
 //cmplx cmplx::operator^(double expon);
 //cmplx cmplx::operator^(cmplx expon);
 
-cmplx cmplx::csin();
-cmplx cmplx::ccos();
-cmplx cmplx::csin_error();
-
 cmplx tangent ( cmplx& x);
 cmplx sinh(cmplx& x);
 cmplx asin(cmplx&x);
