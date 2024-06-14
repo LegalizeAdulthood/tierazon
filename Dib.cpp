@@ -141,7 +141,7 @@ BOOL CDIB::Open(const char* pzFileName)
 		goto bail;
 
 	// Read the DIB into the buffer 32K at a time using ReadHuge
-	file.ReadHuge(m_pDIB, bmpfh.bfSize - nHeaderSize);
+	file.Read(m_pDIB, bmpfh.bfSize - nHeaderSize);
 
 /*	
 	if (((BITMAPINFOHEADER *) m_pDIB)->biSizeImage == 0)
@@ -217,7 +217,7 @@ BOOL CDIB::Save(LPCTSTR pzFileName)
 		file.Write((LPSTR) &bmpfh, nHeaderSize);
 
 		// Write the DIB header and the bits
-		file.WriteHuge(m_pDIB, bmpfh.bfSize - nHeaderSize);
+		file.Write(m_pDIB, bmpfh.bfSize - nHeaderSize);
 	}
 	CATCH (CFileException, e)
 	{
