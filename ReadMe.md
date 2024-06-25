@@ -1,3 +1,5 @@
+![Build status](https://github.com/LegalizeAdulthood/tierazon/actions/workflows/msbuild.yml/badge.svg)
+
 # Tiera-Zon
 
 Tiera-zon is a freeware fractal generator which runs under Windows.
