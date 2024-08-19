@@ -1,0 +1,64 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "project-name-preset",
+      "hidden": true,
+      "description": "Sets the project name based on the preset",
+      "cacheVariables": {
+        "TIERAZON_PROJECT_NAME": {
+          "type": "STRING",
+          "value": "Tierazon ${presetName}"
+        }
+      }
+    },
+    {
+      "name": "sibling-build-preset",
+      "hidden": true,
+      "description": "Use a sibling directory for the build based on the preset name",
+      "binaryDir": "${sourceDir}/../build-tierazon-${presetName}"
+    },
+    {
+      "name": "compile-commands",
+      "hidden": true,
+      "description": "Generate a compile_commands.json database",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      }
+    },
+    {
+      "name": "default",
+      "displayName": "Configure with default settings",
+      "architecture": "Win32",
+      "inherits": [ "sibling-build-preset", "project-name-preset" ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "displayName": "Build with default settings",
+      "configurePreset": "default"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "default",
+      "displayName": "Workflow with default settings: configure, build and test",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "default"
+        },
+        {
+          "type": "build",
+          "name": "default"
+        }
+      ]
+    }
+  ]
+}
