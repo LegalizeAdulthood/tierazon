@@ -1,4 +1,4 @@
-//
+/*
 Complex C++ Utilities
 
 from C Mathematical Function Handbook by Louis Baker
