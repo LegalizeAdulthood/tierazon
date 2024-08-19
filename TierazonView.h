@@ -441,8 +441,8 @@ public:
 
 	///////////////////////////////////////////////////////////////////
 	// Modeless Dialog message routines
-	long OnApply_GradView(UINT wParam, LONG lParam);
-	long OnApply_ShiftView(UINT wParam, LONG lParam);
+        LRESULT OnApply_GradView(WPARAM wParam, LPARAM lParam);
+        LRESULT OnApply_ShiftView(WPARAM wParam, LPARAM lParam);
 	long OnApply_AffineView(UINT wParam, LONG lParam);
 
   // Formulae Parser Functions
@@ -480,7 +480,7 @@ protected:
 protected:
 	afx_msg void OnContextMenu(CWnd*, CPoint point);
 	//{{AFX_MSG(CTierazonView)
-	afx_msg LONG CancelMovie(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT CancelMovie(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnSaveDib();
 	afx_msg void OnWindowSizedesktop();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

@@ -614,7 +614,7 @@ void CTierazonView::OnFractalVideoplayer()
 		AfxMessageBox("Error executing 'aviedi32.exe'");
 }
 
-LONG CTierazonView::CancelMovie(WPARAM wParam, LPARAM lParam)
+LRESULT CTierazonView::CancelMovie(WPARAM wParam, LPARAM lParam)
 {
 	bStartMovie = FALSE;
 	bGlobalDraw = FALSE;

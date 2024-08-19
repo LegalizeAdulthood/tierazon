@@ -2907,7 +2907,7 @@ void CTierazonView::OnUpdateDrawAbort(CCmdUI* pCmdUI)
 	pCmdUI->Enable(bDraw);	
 }
 
-long CTierazonView::OnApply_ShiftView(UINT wParam, LONG lParam)
+LRESULT CTierazonView::OnApply_ShiftView(WPARAM wParam, LPARAM lParam)
 {
 	if (dim.cx > 640 || dim.cy > 480)
 		return 0L;
@@ -3205,7 +3205,7 @@ void CTierazonView::OnUpdateImageColorparameters(CCmdUI* pCmdUI)
 	pCmdUI->Enable(bInitialized);
 }
 
-long CTierazonView::OnApply_GradView(UINT wParam, LONG lParam)
+LRESULT CTierazonView::OnApply_GradView(WPARAM wParam, LPARAM lParam)
 {
 	if (dim.cx > 640 || dim.cy > 480)
 		return 0L;
